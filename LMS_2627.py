@@ -421,6 +421,7 @@ st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=
 # --- 6. Pick a team ---
 teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
 pick = st.selectbox("Pick your team for this week:", teams)
+save_pick_to_google(player, current_gw, pick)
 
 # --- 7. Used teams (example) ---
 used_teams = ["Arsenal", "Chelsea"]
