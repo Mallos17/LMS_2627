@@ -177,7 +177,7 @@ if st.session_state["current_player"] is None:
     st.stop()
 
 player = st.session_state["current_player"]
-st.markdown(
+st.subheader(
     f"<h4 style='text-align:left; color:green;'>Logged in as: **{player}**</h4>",
     unsafe_allow_html=True
 )
