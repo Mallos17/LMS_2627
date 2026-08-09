@@ -449,8 +449,7 @@ st.write(", ".join(used_teams))
 
 # --- 8. Confirm pick ---
 if st.button("Confirm Pick"):
-    team_display = str(pick).strip().upper()
-    st.success(f"You have picked **{team_display}** for Gameweek {current_gw}")
+    st.success(f"You have picked **{pick.upper()}** for Gameweek {current_gw}")
     save_pick_to_google(player, current_gw, pick)
     st.cache_data.clear()
 
