@@ -1,0 +1,446 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Aug  8 22:00:50 2026
+
+@author: matta
+"""
+
+import streamlit as st
+import pandas as pd
+import datetime as dt
+import gspread
+from google.oauth2.service_account import Credentials
+
+st.set_page_config(layout="wide")
+
+st.title("Premier League - Last Man Standing")
+
+def save_player_to_google(player, pin):
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds_dict = st.secrets["google"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    
+    client = gspread.authorize(creds)
+    sh = client.open("LMS_2627")
+
+    # Open or create the "players" sheet
+    try:
+        worksheet = sh.worksheet("players")
+    except gspread.exceptions.WorksheetNotFound:
+        worksheet = sh.add_worksheet(title="players", rows=100, cols=20)
+        worksheet.update("A1", [["player", "pin"]])
+
+    # Append new player
+    worksheet.append_row([player, pin])
+
+def save_pick_to_google(player, gw, team):
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds_dict = st.secrets["google"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    
+    client = gspread.authorize(creds)
+    sh = client.open("LMS_2627")
+
+    # Open or create the "picks" sheet
+    try:
+        worksheet = sh.worksheet("picks")
+    except gspread.exceptions.WorksheetNotFound:
+        worksheet = sh.add_worksheet(title="picks", rows=500, cols=20)
+        worksheet.update("A1", [["player", "gw", "team"]])
+
+    # Append pick
+    worksheet.append_row([player, gw, team])
+
+def load_players_from_google():
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds_dict = st.secrets["google"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    
+    client = gspread.authorize(creds)
+    sh = client.open("LMS_2627")
+
+    worksheet = sh.worksheet("players")
+    data = worksheet.get_all_records()
+
+    # Convert to dict: {player: pin}
+    players = {row["player"]: row["pin"] for row in data}
+    return players
+
+def load_picks_from_google():
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds_dict = st.secrets["google"]
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    
+    client = gspread.authorize(creds)
+    sh = client.open("LMS_2627")
+
+    worksheet = sh.worksheet("picks")
+    data = worksheet.get_all_records()
+
+    # Convert to dict: {player: {gw: team}}
+    picks = {}
+    for row in data:
+        player = row["player"]
+        gw = int(row["gw"])
+        team = row["team"]
+
+        if player not in picks:
+            picks[player] = {}
+
+        picks[player][gw] = team
+
+    return picks
+
+players = load_players_from_google()
+picks = load_picks_from_google()
+
+#CREATING NEW PLAYER#
+#save_player_to_google(new_name, new_pin)
+
+#PLAYER MAKES PICK#
+#save_pick_to_google(player, current_gw, pick)
+
+#LOADING PLAYER and PICKS#
+#stored_pin = players[player]
+#player_picks = picks.get(player, {})
+#used_teams = [
+#    team for gw, team in player_picks.items()
+#    if gw < current_gw]
+
+# --- INITIALIZE SESSION STATE ---
+if "current_player" not in st.session_state:
+    st.session_state["current_player"] = None
+
+choice = st.radio(
+    "Welcome to LMS — what would you like to do?",
+    ["Create New Entry", "Load Player Page"]
+)
+
+# --- CREATE NEW PLAYER ---
+if choice == "Create New Entry":
+    st.header("Create New Player")
+
+    new_name = st.text_input("Enter your full name")
+    new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
+
+    if st.button("Create"):
+        players_dict = load_players_from_google()
+
+        if new_name in players_dict:
+            st.error("This player already exists")
+        else:
+            save_player_to_google(new_name, new_pin)
+            st.success(f"Player {new_name} created")
+
+            st.session_state["current_player"] = new_name
+            st.rerun()
+
+
+# --- LOAD EXISTING PLAYER ---
+if choice == "Load Player Page":
+    st.header("Load Player")
+
+    players_dict = load_players_from_google()
+    players = list(players_dict.keys())
+
+    if len(players) == 0:
+        st.warning("No players created yet")
+        st.stop()
+
+    player = st.selectbox("Select your name", players)
+    pin_input = st.text_input("Enter your PIN", type="password")
+
+    if st.button("Load"):
+        if pin_input != players_dict[player]:
+            st.error("Incorrect PIN")
+        else:
+            st.session_state["current_player"] = player
+            st.success(f"Welcome back, {player}")
+            st.rerun()
+
+
+# --- BLOCK IF NO PLAYER LOGGED IN ---
+if st.session_state["current_player"] is None:
+    st.stop()
+
+player = st.session_state["current_player"]
+st.write(f"Logged in as: **{player}**")
+
+
+
+
+fixtures = pd.read_excel(r"C:\Users\matta\OneDrive\Documents\Matt's Stuff\Footy\PL2627.xlsx")
+
+# Convert
+fixtures["Date"] = pd.to_datetime(fixtures["Date"], format="%d/%m/%Y")
+
+# Convert Time (datetime.time → HH:MM string)
+fixtures["Time"] = fixtures["Time"].apply(lambda t: t.strftime("%H:%M"))
+
+# Sort using a hidden sortable column
+fixtures["TimeSort"] = pd.to_datetime(fixtures["Time"], format="%H:%M")
+fixtures = fixtures.sort_values(["Date", "TimeSort", "Home"])
+fixtures = fixtures.drop(columns=["TimeSort"])
+
+prem_badges = {"Arsenal": "https://crests.football-data.org/57.png",
+"Aston Villa": "https://media.api-sports.io/football/teams/66.png",
+"Bournemouth": "https://media.api-sports.io/football/teams/35.png",
+"Brentford": "https://media.api-sports.io/football/teams/55.png",
+"Brighton": "https://media.api-sports.io/football/teams/51.png",
+"Chelsea": "https://media.api-sports.io/football/teams/49.png",
+"Coventry City": "https://crests.football-data.org/1076.png",
+"Crystal Palace": "https://media.api-sports.io/football/teams/52.png",
+"Everton": "https://media.api-sports.io/football/teams/45.png",
+"Fulham": "https://media.api-sports.io/football/teams/36.png",
+"Hull City": "https://media.api-sports.io/football/teams/64.png",
+"Ipswich Town": "https://media.api-sports.io/football/teams/57.png",
+"Leeds United": "https://media.api-sports.io/football/teams/63.png",
+"Liverpool": "https://crests.football-data.org/64.png",
+"Manchester City": "https://media.api-sports.io/football/teams/50.png",
+"Manchester United": "https://media.api-sports.io/football/teams/33.png",
+"Newcastle United": "https://media.api-sports.io/football/teams/34.png",
+"Nottingham Forest": "https://media.api-sports.io/football/teams/65.png",
+"Sunderland": "https://crests.football-data.org/71.png",
+"Tottenham": "https://crests.football-data.org/73.png"
+}
+
+def badge_html_home(team):
+    url = prem_badges.get(team, "")
+    return f"<img src='{url}' width='25' style='vertical-align:middle;'> {team}"
+
+def badge_html_away(team):
+    url = prem_badges.get(team, "")
+    return f"{team} <img src='{url}' width='25' style='vertical-align:middle;'>"
+
+#fixtures["HomeBadge"] = fixtures["Home"].apply(badge_html)
+#fixtures["AwayBadge"] = fixtures["Away"].apply(badge_html)
+
+def prepare_results_table(df):
+    df = df.copy()
+    
+    df["Date"] = df["Date"].dt.strftime("%d-%b-%Y")
+    
+    # --- 1. Add flags to Team A and Team B ---
+    df["Home"] = df["Home"].apply(badge_html_home)
+    df["Away"] = df["Away"].apply(badge_html_away)
+    
+    df = df.reset_index(drop=True)
+    
+    # Apply right alignment to Home column
+    df["Home"] = df["Home"].apply(lambda x: f"<div style='text-align:left;'>{x}</div>")
+    df["Away"] = df["Away"].apply(lambda x: f"<div style='text-align:right;'>{x}</div>")
+
+    return df
+
+results_display = prepare_results_table(fixtures)
+
+# Today or selected date
+#selected_date = date.today()
+#selected_date = pd.to_datetime(selected_date)
+
+fixtures["Date"] = pd.to_datetime(fixtures["Date"], format="%d/%m/%Y")
+
+gw_start_dates = fixtures.groupby("GW")["Date"].min().sort_values()
+today = dt.date.today()
+
+# Find the most recent GW that has already started
+past_gws = gw_start_dates[gw_start_dates.dt.date <= today]
+
+if len(past_gws) == 0:
+    current_gw = gw_start_dates.index[0]   # season hasn't started yet
+else:
+    current_gw = past_gws.index[-1]        # latest GW that has started
+
+# Next GW
+gw_list = list(gw_start_dates.index)
+current_idx = gw_list.index(current_gw)
+
+next_gw = gw_list[current_idx + 1] if current_idx + 1 < len(gw_list) else None
+current_df = fixtures[fixtures["GW"] == current_gw]
+next_df = fixtures[fixtures["GW"] == next_gw] if next_gw else None
+gw_start = current_df["Date"].min()
+gw_end   = current_df["Date"].max()
+gw_start_date = gw_start.date()
+gw_end_date   = gw_end.date()
+
+# --- 2. Compute gameweek start dates ---
+gw_start_dates = fixtures.groupby("GW")["Date"].min()
+gw_end_dates = fixtures.groupby("GW")["Date"].max()
+gw_list = sorted(gw_start_dates.index)
+
+today = dt.date.today()
+#today = dt.date(2026,8,22)
+past_gws = gw_start_dates[gw_start_dates.dt.date <= today]
+
+current_gw = None
+in_play = False
+
+for gw in gw_list:
+    start = gw_start_dates[gw].date()
+    end   = gw_end_dates[gw].date()
+    if today < start:
+        # Before this GW starts → this GW is the current one
+        current_gw = gw
+        break
+
+    if start <= today <= end:
+        # Inside this GW → this GW is current
+        current_gw = gw
+        in_play = True
+        break
+
+if current_gw is None:
+    current_gw = gw_list[-1]
+    
+# If today is after all GWs → current_gw = last GW
+#if current_gw is None:
+#    current_gw = gw_list[-1]
+
+#if len(past_gws) == 0:
+#    current_gw = gw_start_dates.index[0]
+#else:
+#    current_gw = past_gws.index[-1]
+
+current_idx = gw_list.index(current_gw)
+next_gw = gw_list[current_idx + 1] if current_idx + 1 < len(gw_list) else None
+
+# --- 3. Session state for selected GW ---
+if "selected_gw" not in st.session_state:
+    st.session_state["selected_gw"] = current_gw
+
+# Determine which GW the deadline should belong to
+if next_gw is not None:
+    deadline_gw = next_gw
+else:
+    deadline_gw = current_gw
+
+# Get fixtures for the deadline GW
+deadline_df = fixtures[fixtures["GW"] == current_gw]
+
+# First match of the deadline GW
+first_match = deadline_df.sort_values(["Date", "Time"]).iloc[0]
+first_date = first_match["Date"]
+first_time = first_match["Time"]
+
+# Convert time string to datetime.time
+first_time_dt = dt.datetime.strptime(first_time, "%H:%M").time()
+
+# Evening = kickoff at or after 17:00
+is_evening = first_time_dt >= dt.time(17, 0)
+
+# Deadline rules
+if is_evening:
+    deadline = dt.datetime.combine(first_date, dt.time(12, 0))
+else:
+    day_before = first_date - dt.timedelta(days=1)
+    deadline = dt.datetime.combine(day_before, dt.time(17, 0))
+
+# Countdown
+now = dt.datetime.now()
+time_left = deadline - now
+
+if time_left.total_seconds() <= 0:
+    countdown_text = "Deadline passed"
+else:
+    days = time_left.days
+    hours, remainder = divmod(time_left.seconds, 3600)
+    minutes = remainder // 60
+    countdown_text = f"{days}d {hours}h {minutes}m remaining"
+
+# Display
+if in_play:
+    st.markdown(
+        f"<h4 style='text-align:center; color:#555;'>Current Gameweek: GW{current_gw}</h4>",
+        unsafe_allow_html=True
+    )
+    st.markdown("### Deadline passed - Gameweek in play")
+else:    
+    st.markdown(
+        f"<h4 style='text-align:center; color:#555;'>Current Gameweek: GW{current_gw}</h4>",
+        unsafe_allow_html=True
+        )
+
+    st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+    st.markdown(f"**{countdown_text}**")
+
+
+
+# --- 4. Navigation bar ---
+def gw_nav():
+    # Always recalc index based on current selected GW
+    idx = gw_list.index(st.session_state["selected_gw"])
+
+    cols = st.columns([1,2,2])   # widen the right side
+
+    # LEFT BUTTON — Previous GW
+    with cols[0]:
+        if idx > 0:
+            prev_gw = gw_list[idx - 1]
+            if st.button(f"◀ GW {prev_gw}"):
+                st.session_state["selected_gw"] = prev_gw
+                st.rerun()
+
+    # MIDDLE — Current GW title
+    with cols[1]:
+        st.markdown(
+            f"<h3 style='text-align:center;'>Gameweek {st.session_state['selected_gw']}</h3>",
+            unsafe_allow_html=True
+        )
+
+    # RIGHT — Next GW + Go to Current GW
+    with cols[2]:
+        right_cols = st.columns([1,1])
+
+        # Next GW button
+        with right_cols[0]:
+            if idx + 1 < len(gw_list):
+                next_gw = gw_list[idx + 1]
+                if st.button(f"GW {next_gw} ▶"):
+                    st.session_state["selected_gw"] = next_gw
+                    st.rerun()
+
+        # Go to Current GW button
+        with right_cols[1]:
+            if st.button("Current GW"):
+                st.session_state["selected_gw"] = current_gw
+                st.rerun()
+
+
+
+gw_nav()
+
+# --- 5. Fixtures for selected GW ---
+gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
+gw_df_display = prepare_results_table(gw_df)
+st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
+
+# --- 6. Pick a team ---
+teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
+pick = st.selectbox("Pick your team for this week:", teams)
+
+# --- 7. Used teams (example) ---
+used_teams = ["Arsenal", "Chelsea"]
+st.markdown("### Teams you've already used:")
+st.write(", ".join(used_teams))
+
+# --- 8. Confirm pick ---
+if st.button("Confirm Pick"):
+    st.success(f"You picked {pick} for Gameweek {st.session_state['selected_gw']}")
+
+
