@@ -59,6 +59,9 @@ def save_pick_to_google(player, gw, team):
     # Append pick
     worksheet.append_row([player, gw, team])
 
+import streamlit as st
+
+@st.cache_data(ttl=300)  # cache for 5 minutes
 def load_players_from_google():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -70,14 +73,12 @@ def load_players_from_google():
     
     client = gspread.authorize(creds)
     sh = client.open("LMS_2627")
-
     worksheet = sh.worksheet("players")
     data = worksheet.get_all_records()
-
-    # Convert to dict: {player: pin}
     players = {row["player"]: row["pin"] for row in data}
     return players
 
+@st.cache_data(ttl=300)
 def load_picks_from_google():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -89,26 +90,11 @@ def load_picks_from_google():
     
     client = gspread.authorize(creds)
     sh = client.open("LMS_2627")
-
     worksheet = sh.worksheet("picks")
     data = worksheet.get_all_records()
-
-    # Convert to dict: {player: {gw: team}}
-    picks = {}
-    for row in data:
-        player = row["player"]
-        gw = int(row["gw"])
-        team = row["team"]
-
-        if player not in picks:
-            picks[player] = {}
-
-        picks[player][gw] = team
-
+    picks = {row["player"]: row["pick"] for row in data}
     return picks
 
-players = load_players_from_google()
-picks = load_picks_from_google()
 
 #CREATING NEW PLAYER#
 #save_player_to_google(new_name, new_pin)
