@@ -367,13 +367,13 @@ else:
 # Display
 if in_play:
     st.markdown(
-        f"<h4 style='text-align:center; color:#555;'>Current Gameweek: GW{current_gw}</h4>",
+        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
         unsafe_allow_html=True
     )
-    st.markdown("### Deadline passed - Gameweek in play")
+    st.markdown("<h4 style='color: red;'>#### Deadline passed - Gameweek in play</h4>")
 else:    
     st.markdown(
-        f"<h4 style='text-align:center; color:#555;'>Current Gameweek: GW{current_gw}</h4>",
+        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
         unsafe_allow_html=True
         )
 
