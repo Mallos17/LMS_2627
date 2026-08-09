@@ -185,7 +185,9 @@ st.write(f"Logged in as: **{player}**")
 
 
 
-fixtures = pd.read_excel(r"C:\Users\matta\OneDrive\Documents\Matt's Stuff\Footy\PL2627.xlsx")
+#fixtures = pd.read_excel(r"C:\Users\matta\OneDrive\Documents\Matt's Stuff\Footy\PL2627.xlsx")
+url = "https://github.com/Mallos17/LMS_2627/blob/main/PL2627.xlsx"
+fixtures = pd.read_excel(url)
 
 # Convert
 fixtures["Date"] = pd.to_datetime(fixtures["Date"], format="%d/%m/%Y")
