@@ -434,7 +434,7 @@ player_picks = picks.get(player, {})
 existing_pick = player_picks.get(current_gw)
 
 if existing_pick:
-    st.warning(f"You already picked **{existing_pick}** for GW{current_gw}.")
+    st.warning(f"You have picked **{existing_pick}** for GW{current_gw}.")
     st.stop()
 
 else:
@@ -449,7 +449,7 @@ st.write(", ".join(used_teams))
 
 # --- 8. Confirm pick ---
 if st.button("Confirm Pick"):
-    st.success(f"You picked {pick} for Gameweek {st.session_state['selected_gw']}")
+    st.success(f"You have picked {pick} for Gameweek {current_gw}")
     save_pick_to_google(player, current_gw, pick)
     st.cache_data.clear()
 
