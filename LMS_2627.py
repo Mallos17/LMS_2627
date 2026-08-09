@@ -177,11 +177,7 @@ if st.session_state["current_player"] is None:
     st.stop()
 
 player = st.session_state["current_player"]
-st.subheader(
-    f"<h4 style='text-align:left; color:green;'>Logged in as: **{player}**</h4>",
-    unsafe_allow_html=True
-)
-#st.header(f"Logged in as: **{player}**")
+st.subheader(f"Logged in as: **{player}**")
 
 
 #fixtures = pd.read_excel(r"C:\Users\matta\OneDrive\Documents\Matt's Stuff\Footy\PL2627.xlsx")
