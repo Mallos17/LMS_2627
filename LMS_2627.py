@@ -92,7 +92,18 @@ def load_picks_from_google():
     sh = client.open("LMS_2627")
     worksheet = sh.worksheet("picks")
     data = worksheet.get_all_records()
-    picks = {row["player"]: row["pick"] for row in data}
+    # Store picks as: picks[player][gw] = pick
+    picks = {}
+    for row in data:
+        p = row["player"]
+        gw = row["gw"]
+        pick = row["pick"]
+
+        if p not in picks:
+            picks[p] = {}
+
+        picks[p][gw] = pick
+
     return picks
 
 
@@ -104,7 +115,7 @@ def load_picks_from_google():
 
 #LOADING PLAYER and PICKS#
 #stored_pin = players[player]
-#player_picks = picks.get(player, {})
+
 #used_teams = [
 #    team for gw, team in player_picks.items()
 #    if gw < current_gw]
@@ -418,10 +429,18 @@ gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
 gw_df_display = prepare_results_table(gw_df)
 st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
 
-# --- 6. Pick a team ---
-teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
-pick = st.selectbox("Pick your team for this week:", teams)
-save_pick_to_google(player, current_gw, pick)
+player_picks = picks.get(player, {})
+existing_pick = player_picks.get(current_gw)
+
+if existing_pick:
+    st.warning(f"You already picked **{existing_pick}** for GW {current_gw}.")
+    st.stop()
+
+else:
+    # --- 6. Pick a team ---
+    teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
+    pick = st.selectbox("Pick your team for this week:", teams)
+    save_pick_to_google(player, current_gw, pick)
 
 # --- 7. Used teams (example) ---
 used_teams = ["Arsenal", "Chelsea"]
