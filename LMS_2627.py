@@ -78,7 +78,7 @@ def load_players_from_google():
     players = {row["player"]: str(row["pin"]) for row in data}
     return players
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)
 def load_picks_from_google():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -451,5 +451,6 @@ st.write(", ".join(used_teams))
 if st.button("Confirm Pick"):
     st.success(f"You picked {pick} for Gameweek {st.session_state['selected_gw']}")
     save_pick_to_google(player, current_gw, pick)
+    st.cache_data.clear()
 
 
