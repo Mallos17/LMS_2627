@@ -441,7 +441,6 @@ else:
     # --- 6. Pick a team ---
     teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
     pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
-    save_pick_to_google(player, current_gw, pick)
 
 # --- 7. Used teams (example) ---
 used_teams = ["Arsenal", "Chelsea"]
@@ -451,5 +450,6 @@ st.write(", ".join(used_teams))
 # --- 8. Confirm pick ---
 if st.button("Confirm Pick"):
     st.success(f"You picked {pick} for Gameweek {st.session_state['selected_gw']}")
+    save_pick_to_google(player, current_gw, pick)
 
 
