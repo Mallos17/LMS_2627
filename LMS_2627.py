@@ -75,7 +75,7 @@ def load_players_from_google():
     sh = client.open("LMS_2627")
     worksheet = sh.worksheet("players")
     data = worksheet.get_all_records()
-    players = {row["player"]: row["pin"] for row in data}
+    players = {row["player"]: str(row["pin"]) for row in data}
     return players
 
 @st.cache_data(ttl=300)
