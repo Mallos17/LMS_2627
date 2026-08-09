@@ -429,7 +429,8 @@ gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
 gw_df_display = prepare_results_table(gw_df)
 st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
 
-player_picks = load_picks_from_google().get(player, {})
+picks = load_picks_from_google()
+player_picks = picks.get(player, {})
 existing_pick = player_picks.get(current_gw)
 
 if existing_pick:
