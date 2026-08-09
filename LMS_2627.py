@@ -434,13 +434,13 @@ player_picks = picks.get(player, {})
 existing_pick = player_picks.get(current_gw)
 
 if existing_pick:
-    st.warning(f"You already picked **{existing_pick}** for GW {current_gw}.")
+    st.warning(f"You already picked **{existing_pick}** for GW{current_gw}.")
     st.stop()
 
 else:
     # --- 6. Pick a team ---
     teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
-    pick = st.selectbox("Pick your team for this week:", teams)
+    pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
     save_pick_to_google(player, current_gw, pick)
 
 # --- 7. Used teams (example) ---
