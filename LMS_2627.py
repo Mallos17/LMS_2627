@@ -431,10 +431,7 @@ if st.session_state.page == "Player Picks":
     gw_df_display = prepare_results_table(gw_df)
     
     # Display
-    if existing_pick:
-        st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
-
-    elif in_play:
+    if in_play:
         st.markdown(
             f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
             unsafe_allow_html=True
@@ -448,7 +445,10 @@ if st.session_state.page == "Player Picks":
 
         st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
         st.markdown(f"**{countdown_text}**")
-        
+    
+    if existing_pick:
+        st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
+    else:
         # --- 6. Pick a team ---
         teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
         pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
