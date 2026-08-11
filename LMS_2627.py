@@ -466,6 +466,7 @@ if st.session_state.page == "Player Picks":
 
     #gw_nav()
 
+    st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
 
-
-st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
+elif st.session_state.page == "Leaderboard":
+    st.header("You 'Ornsssssssssssssssss!")
