@@ -151,6 +151,9 @@ def nav_button(label):
 
 nav_button("Player")
 nav_button("Leaderboard")
+nav_button("2")
+nav_button("5")
+nav_button("10")
 
 st.write(f"Current page: {st.session_state.page}")
 
