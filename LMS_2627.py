@@ -164,9 +164,10 @@ if st.session_state.page == "Player Picks":
     # --- CREATE NEW PLAYER ---
     if choice == "Create New Entry":
         st.text("Create New Player")
-        st.caption("Please create a PIN to log in. Recommended PINs are birthdays, years etc, don't pick your credit card PINs due to security risks")
 
         new_name = st.text_input("Enter your full name")
+        
+        st.caption("Please create a PIN to log in. Recommended PINs are birthdays, years etc, don't pick your credit card PINs due to security risks")
         new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
 
         if st.button("Create"):
