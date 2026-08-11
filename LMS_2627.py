@@ -486,4 +486,4 @@ if st.button("Confirm Pick"):
     save_pick_to_google(player, current_gw, pick)
     st.cache_data.clear()
 
-
+st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
