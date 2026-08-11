@@ -208,8 +208,8 @@ gw_start_dates = fixtures.groupby("GW")["Date"].min()
 gw_end_dates = fixtures.groupby("GW")["Date"].max()
 gw_list = sorted(gw_start_dates.index)
 
-today = dt.date.today()
-#today = dt.date(2026,8,22)
+#today = dt.date.today()
+today = dt.date(2026,8,22)
 past_gws = gw_start_dates[gw_start_dates.dt.date <= today]
 
 current_gw = None
@@ -231,15 +231,6 @@ for gw in gw_list:
 
 if current_gw is None:
     current_gw = gw_list[-1]
-    
-# If today is after all GWs → current_gw = last GW
-#if current_gw is None:
-#    current_gw = gw_list[-1]
-
-#if len(past_gws) == 0:
-#    current_gw = gw_start_dates.index[0]
-#else:
-#    current_gw = past_gws.index[-1]
 
 current_idx = gw_list.index(current_gw)
 next_gw = gw_list[current_idx + 1] if current_idx + 1 < len(gw_list) else None
