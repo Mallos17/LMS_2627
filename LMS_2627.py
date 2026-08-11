@@ -436,7 +436,7 @@ if st.session_state.page == "Player Picks":
     )
     
     # Display
-    if in_play:
+    if in_play and existing_pick:
         st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
         st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
     elif in_play and not existing_pick:
