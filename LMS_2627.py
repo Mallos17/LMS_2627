@@ -126,31 +126,25 @@ if "current_player" not in st.session_state:
 
 import streamlit as st
 
-# Initialize state
-if "active_tab" not in st.session_state:
-    st.session_state.active_tab = "Player"
+if "tab" not in st.session_state:
+    st.session_state.tab = "Player"
 
-def set_tab(tab):
-    st.session_state.active_tab = tab
+tabs = ["Player", "Leaderboard"]
 
-# Sidebar tab menu
-st.sidebar.markdown("### Menu")
-
-col1, col2 = st.sidebar.columns(2)
-col1.button("Player", on_click=set_tab, args=("Player",))
-col2.button("Leaderboard", on_click=set_tab, args=("Leaderboard",))
-
-# Highlight active tab
-st.sidebar.markdown(
-    f"<p style='font-weight:600; color:#4A90E2;'>{st.session_state.active_tab}</p>",
-    unsafe_allow_html=True
+selected = st.sidebar.radio(
+    "",
+    tabs,
+    horizontal=True,
+    label_visibility="collapsed"
 )
 
-# Render content
-if st.session_state.active_tab == "Player":
-    st.write("Player view goes here")
-elif st.session_state.active_tab == "Leaderboard":
-    st.write("Leaderboard view goes here")
+st.session_state.tab = selected
+
+if selected == "Player":
+    st.write("Player content")
+else:
+    st.write("Leaderboard content")
+
 
 
 choice = st.radio(
