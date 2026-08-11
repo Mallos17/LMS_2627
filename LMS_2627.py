@@ -149,7 +149,7 @@ def nav_button(label):
     if st.sidebar.button(label):
         st.session_state.page = label
 
-nav_button("Player")
+nav_button("Player Picks")
 nav_button("Leaderboard")
 nav_button("2")
 nav_button("5")
@@ -473,15 +473,15 @@ else:
     teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
     pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
 
-    # --- 7. Used teams (example) ---
-    used_teams = ["Arsenal", "Chelsea"]
-    st.markdown("### Teams not available to you:")
-    st.write(", ".join(used_teams))
-
     # --- 8. Confirm pick ---
     if st.button("Confirm Pick"):
         st.success(f"You have picked **{pick.upper()}** for Gameweek {current_gw}")
         save_pick_to_google(player, current_gw, pick)
         st.cache_data.clear()
+    
+    # --- 7. Used teams (example) ---
+    used_teams = ["Arsenal", "Chelsea"]
+    st.markdown("### Teams not available to you:")
+    st.write(", ".join(used_teams))
 
 st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
