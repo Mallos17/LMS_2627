@@ -125,7 +125,23 @@ if "current_player" not in st.session_state:
     st.session_state["current_player"] = None
 
 #page = st.sidebar.radio("Navigation", ["Home", "Analytics", "Admin"])
-slider = st.sidebar.slider("beep",0,1,2)
+#slider = st.sidebar.slider("beep",0,1,2)
+page = st.sidebar.radio("Go to", ["Dashboard", "Reports", "Settings"])
+if page == "Dashboard":
+    st.text("Dashboard")
+elif page == "Reports":
+    st.text("Reports")
+
+start = st.sidebar.date_input("Start date")
+end = st.sidebar.date_input("End date")
+category = st.sidebar.selectbox("Category", ["A", "B", "C"])
+
+with st.sidebar.expander("Advanced Settings"):
+    st.checkbox("Enable debug mode")
+    st.number_input("Max iterations", 1, 1000)
+
+st.sidebar.button("Click me")
+st.sidebar.text_input("Name")
 
 
 choice = st.radio(
