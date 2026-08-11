@@ -439,6 +439,8 @@ if st.session_state.page == "Player Picks":
     if in_play:
         st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
         st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
+    elif in_play and not existing_pick:
+        st.warning(f"No pick selected for for GW{current_gw}")
     elif not in_play and existing_pick:
         st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
         st.markdown(f"**{countdown_text}**")
