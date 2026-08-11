@@ -278,22 +278,6 @@ else:
     minutes = remainder // 60
     countdown_text = f"{days}d {hours}h {minutes}m remaining"
 
-# Display
-if in_play:
-    st.markdown(
-        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
-        unsafe_allow_html=True
-    )
-    st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
-else:    
-    st.markdown(
-        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
-        unsafe_allow_html=True
-        )
-
-    st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
-    st.markdown(f"**{countdown_text}**")
-
 
 #CREATING NEW PLAYER#
 #save_player_to_google(new_name, new_pin)
@@ -397,7 +381,23 @@ if st.session_state.page == "Player Picks":
         st.stop()
 
     player = st.session_state["current_player"]
-    st.text(f"Logged in as: {player}")
+    st.markdown(f"Logged in as: **{player}**")
+    
+    # Display
+    if in_play:
+        st.markdown(
+            f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
+            unsafe_allow_html=True
+        )
+        st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
+    else:    
+        st.markdown(
+            f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
+            unsafe_allow_html=True
+            )
+
+        st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+        st.markdown(f"**{countdown_text}**")
 
 
 
