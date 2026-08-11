@@ -124,24 +124,33 @@ def load_picks_from_google():
 if "current_player" not in st.session_state:
     st.session_state["current_player"] = None
 
-#page = st.sidebar.radio("Navigation", ["Home", "Analytics", "Admin"])
-#slider = st.sidebar.slider("beep",0,1,2)
-page = st.sidebar.radio("Go to", ["Dashboard", "Reports", "Settings"])
-if page == "Dashboard":
-    st.text("Dashboard")
-elif page == "Reports":
-    st.text("Reports")
+import streamlit as st
 
-start = st.sidebar.date_input("Start date")
-end = st.sidebar.date_input("End date")
-category = st.sidebar.selectbox("Category", ["A", "B", "C"])
+# Initialize state
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = "Player"
 
-with st.sidebar.expander("Advanced Settings"):
-    st.checkbox("Enable debug mode")
-    st.number_input("Max iterations", 1, 1000)
+def set_tab(tab):
+    st.session_state.active_tab = tab
 
-st.sidebar.button("Click me")
-st.sidebar.text_input("Name")
+# Sidebar tab menu
+st.sidebar.markdown("### Menu")
+
+col1, col2 = st.sidebar.columns(2)
+col1.button("Player", on_click=set_tab, args=("Player",))
+col2.button("Leaderboard", on_click=set_tab, args=("Leaderboard",))
+
+# Highlight active tab
+st.sidebar.markdown(
+    f"<p style='font-weight:600; color:#4A90E2;'>{st.session_state.active_tab}</p>",
+    unsafe_allow_html=True
+)
+
+# Render content
+if st.session_state.active_tab == "Player":
+    st.write("Player view goes here")
+elif st.session_state.active_tab == "Leaderboard":
+    st.write("Leaderboard view goes here")
 
 
 choice = st.radio(
