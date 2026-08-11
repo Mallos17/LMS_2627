@@ -151,68 +151,63 @@ def nav_button(label):
 
 nav_button("Player Picks")
 nav_button("Leaderboard")
-nav_button("2")
-nav_button("5")
-nav_button("10")
 
 st.write(f"Current page: {st.session_state.page}")
 
+if st.session_state.page == "Player Picks":
 
+    choice = st.radio(
+        "Welcome to LMS — what would you like to do?",
+        ["Create New Entry", "Load Player Page"]
+        )
 
-choice = st.radio(
-    "Welcome to LMS — what would you like to do?",
-    ["Create New Entry", "Load Player Page"]
-)
+    # --- CREATE NEW PLAYER ---
+    if choice == "Create New Entry":
+        st.header("Create New Player")
 
-# --- CREATE NEW PLAYER ---
-if choice == "Create New Entry":
-    st.header("Create New Player")
+        new_name = st.text_input("Enter your full name")
+        new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
 
-    new_name = st.text_input("Enter your full name")
-    new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
+        if st.button("Create"):
+            players_dict = load_players_from_google()
 
-    if st.button("Create"):
+            if new_name in players_dict:
+                st.error("This player already exists")
+            else:
+                save_player_to_google(new_name, new_pin)
+                st.success(f"Player {new_name} created")
+
+                st.session_state["current_player"] = new_name
+                st.rerun()
+
+    # --- LOAD EXISTING PLAYER ---
+    if choice == "Load Player Page":
+        st.header("Load Player")
+
         players_dict = load_players_from_google()
+        players = list(players_dict.keys())
 
-        if new_name in players_dict:
-            st.error("This player already exists")
-        else:
-            save_player_to_google(new_name, new_pin)
-            st.success(f"Player {new_name} created")
+        if len(players) == 0:
+            st.warning("No players created yet")
+            st.stop()
 
-            st.session_state["current_player"] = new_name
-            st.rerun()
+        player = st.selectbox("Select your name", players)
+        pin_input = st.text_input("Enter your PIN", type="password")
 
+        if st.button("Load"):
+            if pin_input != players_dict[player]:
+                st.error("Incorrect PIN")
+            else:
+                st.session_state["current_player"] = player
+                st.success(f"Welcome back, {player}")
+                st.rerun()
 
-# --- LOAD EXISTING PLAYER ---
-if choice == "Load Player Page":
-    st.header("Load Player")
-
-    players_dict = load_players_from_google()
-    players = list(players_dict.keys())
-
-    if len(players) == 0:
-        st.warning("No players created yet")
+    # --- BLOCK IF NO PLAYER LOGGED IN ---
+    if st.session_state["current_player"] is None:
         st.stop()
 
-    player = st.selectbox("Select your name", players)
-    pin_input = st.text_input("Enter your PIN", type="password")
-
-    if st.button("Load"):
-        if pin_input != players_dict[player]:
-            st.error("Incorrect PIN")
-        else:
-            st.session_state["current_player"] = player
-            st.success(f"Welcome back, {player}")
-            st.rerun()
-
-
-# --- BLOCK IF NO PLAYER LOGGED IN ---
-if st.session_state["current_player"] is None:
-    st.stop()
-
-player = st.session_state["current_player"]
-st.text(f"Logged in as: **{player}**")
+    player = st.session_state["current_player"]
+    st.text(f"Logged in as: {player}")
 
 
 #fixtures = pd.read_excel(r"C:\Users\matta\OneDrive\Documents\Matt's Stuff\Footy\PL2627.xlsx")
