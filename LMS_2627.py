@@ -126,24 +126,33 @@ if "current_player" not in st.session_state:
 
 import streamlit as st
 
-if "tab" not in st.session_state:
-    st.session_state.tab = "Player"
+if "page" not in st.session_state:
+    st.session_state.page = "Player"
 
-tabs = ["Player", "Leaderboard"]
+def nav_button(label):
+    style = """
+        <style>
+            .nav-btn {
+                padding: 8px 12px;
+                border-radius: 6px;
+                background-color: #f5f5f5;
+                margin-bottom: 6px;
+                cursor: pointer;
+            }
+            .nav-btn:hover {
+                background-color: #e0e0e0;
+            }
+        </style>
+    """
+    st.sidebar.markdown(style, unsafe_allow_html=True)
 
-selected = st.sidebar.radio(
-    "",
-    tabs,
-    horizontal=True,
-    label_visibility="collapsed"
-)
+    if st.sidebar.button(label):
+        st.session_state.page = label
 
-st.session_state.tab = selected
+nav_button("Player")
+nav_button("Leaderboard")
 
-if selected == "Player":
-    st.write("Player content")
-else:
-    st.write("Leaderboard content")
+st.write(f"Current page: {st.session_state.page}")
 
 
 
