@@ -460,7 +460,6 @@ gw_nav()
 # --- 5. Fixtures for selected GW ---
 gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
 gw_df_display = prepare_results_table(gw_df)
-st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
 
 picks = load_picks_from_google()
 player_picks = picks.get(player, {})
