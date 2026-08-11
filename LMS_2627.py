@@ -127,7 +127,7 @@ if "current_player" not in st.session_state:
 import streamlit as st
 
 if "page" not in st.session_state:
-    st.session_state.page = "Player"
+    st.session_state.page = "Player Picks"
 
 def nav_button(label):
     style = """
@@ -163,7 +163,8 @@ if st.session_state.page == "Player Picks":
 
     # --- CREATE NEW PLAYER ---
     if choice == "Create New Entry":
-        st.header("Create New Player")
+        st.subheader("Create New Player")
+        st.text("Please create a PIN to log in. Recommended PINs are birthdays, years etc, don't pick your credit card PINs due to security risks")
 
         new_name = st.text_input("Enter your full name")
         new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
