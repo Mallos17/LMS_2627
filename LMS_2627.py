@@ -124,9 +124,7 @@ def load_picks_from_google():
 if "current_player" not in st.session_state:
     st.session_state["current_player"] = None
 
-page = st.sidebar.radio("Navigation", ["Home", "Analytics", "Admin"])
-
-page1 = st.selectbox("Go to", ["Home", "Reports", "Settings"])
+page = st.sidebar("Navigation", ["Home", "Analytics", "Admin"])
 
 
 choice = st.radio(
