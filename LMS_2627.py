@@ -172,6 +172,45 @@ def prepare_results_table(df):
 
     return df
 
+def gw_nav():
+    # Always recalc index based on current selected GW
+    idx = gw_list.index(st.session_state["selected_gw"])
+
+    cols = st.columns([1,2,2])   # widen the right side
+
+    # LEFT BUTTON — Previous GW
+    with cols[0]:
+        if idx > 0:
+            prev_gw = gw_list[idx - 1]
+            if st.button(f"◀ GW {prev_gw}"):
+                st.session_state["selected_gw"] = prev_gw
+                st.rerun()
+
+    # MIDDLE — Current GW title
+    with cols[1]:
+        st.markdown(
+            f"<h3 style='text-align:center;'>Gameweek {st.session_state['selected_gw']}</h3>",
+            unsafe_allow_html=True
+        )
+
+    # RIGHT — Next GW + Go to Current GW
+    with cols[2]:
+        right_cols = st.columns([1,1])
+
+        # Next GW button
+        with right_cols[0]:
+            if idx + 1 < len(gw_list):
+                next_gw = gw_list[idx + 1]
+                if st.button(f"GW {next_gw} ▶"):
+                    st.session_state["selected_gw"] = next_gw
+                    st.rerun()
+
+        # Go to Current GW button
+        with right_cols[1]:
+            if st.button("Current GW"):
+                st.session_state["selected_gw"] = current_gw
+                st.rerun()
+                
 results_display = prepare_results_table(fixtures)
 
 # Today or selected date
@@ -399,51 +438,7 @@ if st.session_state.page == "Player Picks":
         st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
         st.markdown(f"**{countdown_text}**")
 
-
-
-# --- 4. Navigation bar ---
-def gw_nav():
-    # Always recalc index based on current selected GW
-    idx = gw_list.index(st.session_state["selected_gw"])
-
-    cols = st.columns([1,2,2])   # widen the right side
-
-    # LEFT BUTTON — Previous GW
-    with cols[0]:
-        if idx > 0:
-            prev_gw = gw_list[idx - 1]
-            if st.button(f"◀ GW {prev_gw}"):
-                st.session_state["selected_gw"] = prev_gw
-                st.rerun()
-
-    # MIDDLE — Current GW title
-    with cols[1]:
-        st.markdown(
-            f"<h3 style='text-align:center;'>Gameweek {st.session_state['selected_gw']}</h3>",
-            unsafe_allow_html=True
-        )
-
-    # RIGHT — Next GW + Go to Current GW
-    with cols[2]:
-        right_cols = st.columns([1,1])
-
-        # Next GW button
-        with right_cols[0]:
-            if idx + 1 < len(gw_list):
-                next_gw = gw_list[idx + 1]
-                if st.button(f"GW {next_gw} ▶"):
-                    st.session_state["selected_gw"] = next_gw
-                    st.rerun()
-
-        # Go to Current GW button
-        with right_cols[1]:
-            if st.button("Current GW"):
-                st.session_state["selected_gw"] = current_gw
-                st.rerun()
-
-
-
-gw_nav()
+    #gw_nav()
 
 # --- 5. Fixtures for selected GW ---
 gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
