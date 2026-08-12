@@ -355,7 +355,7 @@ choice = st.sidebar.radio(
 # Store active page
 st.session_state.page = choice
 
-# Style the active item
+# CSS that works in BOTH light and dark mode
 st.sidebar.markdown("""
 <style>
 /* Base button-like style */
@@ -367,16 +367,15 @@ div[role="radiogroup"] > label {
     background-color: var(--background-color);
     margin-bottom: 6px;
     cursor: pointer;
-
-    /* Text colour for inactive buttons */
-    color: var(--text-color);
+    color: var(--text-color);   /* readable in dark mode */
 }
 
 /* ACTIVE option */
 div[role="radiogroup"] > label[data-selected="true"] {
     background-color: #FFD700 !important;   /* gold */
-    color: black !important;                /* readable in dark mode */
-    font-weight: bold !important;
+    color: black !important;                /* black text */
+    font-weight: bold !important;           /* bold */
+    text-transform: uppercase !important;   /* uppercase */
 }
 </style>
 """, unsafe_allow_html=True)
