@@ -340,45 +340,43 @@ if "current_player" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page = "Player Picks"
 
-# Sidebar navigation buttons
-pages = ["Player Picks", "Leaderboard"]
+pages = {
+    "Player Picks": "⭐",
+    "Leaderboard": "🏆"
+}
 
-# Render buttons and detect clicks
-for label in pages:
-    if st.sidebar.button(label):
-        st.session_state.page = label
+# Render buttons inside identifiable containers
+for label, icon in pages.items():
+    container = st.sidebar.container()
 
-# Find index of active page
-active_index = pages.index(st.session_state.page) + 1  # nth-child is 1-based
+    # Apply active styling to the container
+    if st.session_state.page == label:
+        container.markdown(
+            """
+            <style>
+                .active-nav {
+                    background-color: #FFD700;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    border: 1px solid #DAA520;
+                    font-weight: bold;
+                    color: black;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        css_class = "active-nav"
+    else:
+        css_class = ""
 
-# Apply CSS to highlight ONLY the active button
-st.sidebar.markdown(f"""
-    <style>
-        /* Base button style */
-        div.stButton > button {{
-            width: 100%;
-            text-align: left;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            background-color: #f5f5f5;
-            color: black;
-            font-weight: normal;
-        }}
+    # Render the button inside the styled container
+    with container:
+        if st.button(f"{icon} {label}", key=label):
+            st.session_state.page = label
 
-        div.stButton > button:hover {{
-            background-color: #e0e0e0;
-        }}
-
-        /* ACTIVE BUTTON — gold + bold + black text */
-        div.stButton:nth-of-type({active_index}) > button {{
-            background-color: #FFD700 !important;
-            color: black !important;
-            font-weight: bold !important;
-            border: 1px solid #DAA520 !important;
-        }}
-    </style>
-""", unsafe_allow_html=True)
+        # Wrap the button label in a styled div (this styles the container, not the button)
+        st.markdown(f"<div class='{css_class}'></div>", unsafe_allow_html=True)
 
 #nav_button("Player Picks")
 #nav_button("Leaderboard")
