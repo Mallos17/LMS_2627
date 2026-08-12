@@ -345,23 +345,19 @@ pages = {
     "Leaderboard": "🏆"
 }
 
-# Wrap the radio in a uniquely identifiable container
-nav_container = st.sidebar.container()
-with nav_container:
-    choice = st.radio(
-        "Navigation",
-        list(pages.keys()),
-        format_func=lambda x: f"{pages[x]}  {x}",
-        key="nav_radio"
-    )
+choice = st.sidebar.radio(
+    "Navigation",
+    list(pages.keys()),
+    format_func=lambda x: f"{pages[x]}  {x}"
+)
 
 st.session_state.page = choice
 
-# Scoped CSS — ONLY affects the nav radio
+# CSS that forces colours even in dark mode
 st.sidebar.markdown("""
 <style>
 
-#nav_radio_container div[role="radiogroup"] > label {
+div[role="radiogroup"] > label {
     display: block;
     padding: 8px 12px;
     border-radius: 6px;
@@ -369,25 +365,21 @@ st.sidebar.markdown("""
     background-color: var(--background-color);
     margin-bottom: 6px;
     cursor: pointer;
+
+    /* Inactive text colour — works in dark mode */
     color: var(--text-color) !important;
 }
 
 /* ACTIVE option */
-#nav_radio_container div[role="radiogroup"] > label[data-selected="true"] {
-    background-color: #FFD700 !important;
-    color: #000000 !important;
-    font-weight: 800 !important;
-    text-transform: uppercase !important;
+div[role="radiogroup"] > label[data-selected="true"] {
+    background-color: #FFD700 !important;   /* gold */
+    color: #000000 !important;              /* FORCE black text */
+    font-weight: 800 !important;            /* bold */
+    text-transform: uppercase !important;   /* uppercase */
 }
 
 </style>
 """, unsafe_allow_html=True)
-
-# Attach an ID to the container so CSS can target it
-nav_container.markdown(
-    "<div id='nav_radio_container'></div>",
-    unsafe_allow_html=True
-)
 
 st.markdown("""
 <style>
