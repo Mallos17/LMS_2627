@@ -508,19 +508,26 @@ elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
     st.write(picks)
-    leaderboard = {}
 
+    # Convert your dictionary into a list of rows
+    rows = []
     for player, gw_dict in picks.items():
-        # gw_dict looks like {"1": "Bournemouth"}
-        picks_list = list(gw_dict.values())  # extract all picks across GWs
-        leaderboard[player] = picks_list
+        row = {"Player Name": player}
+        for gw, pick in gw_dict.items():
+            row[f"GW {gw}"] = pick
+        rows.append(row)
 
-    lb_df = pd.DataFrame([
-    {"player": player, **gw_dict}
-    for player, gw_dict in picks.items()
-    ])
+    # Build the dataframe
+    lb_df = pd.DataFrame(rows)
 
+    # Ensure columns are sorted properly (Player Name first, then GW 1, GW 2, ...)
+    sorted_cols = ["Player Name"] + sorted(
+        [col for col in lb_df.columns if col.startswith("GW ")],
+        key=lambda x: int(x.split()[1])
+        )
+
+    lb_df = lb_df[sorted_cols]
+
+    # Display without index
     st.dataframe(lb_df, use_container_width=True)
-
-
     
