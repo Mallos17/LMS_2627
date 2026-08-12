@@ -507,7 +507,7 @@ if st.session_state.page == "Player Picks":
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
-    st.write(picks[0])
+    st.write(picks)
     leaderboard = {}
 
     for entry in picks:
