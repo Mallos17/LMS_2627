@@ -561,6 +561,9 @@ def build_leaderboard1(picks_dict):
         for gw_dict in picks_dict.values()
     ]
     freq = Counter(latest_raw_picks)
+    
+    for player, gw_dict in picks_dict.items():
+        st.text(print(player, gw_dict.get(str(latest_gw))))
 
     # Build rows WITHOUT badges
     for player, gw_dict in picks_dict.items():
@@ -587,13 +590,13 @@ def build_leaderboard1(picks_dict):
     )
 
     # Drop helper columns
-    df = df.drop(columns=["_freq", "_alpha"])
+    #df = df.drop(columns=["_freq", "_alpha"])
 
     # Sort GW columns numerically
     gw_cols = [col for col in df.columns if col.startswith("GW ")]
     gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
-    df = df[["Player Name"] + gw_cols_sorted]
+    #df = df[["Player Name"] + gw_cols_sorted]
 
     # ⭐ NOW add badges AFTER sorting
     #for col in gw_cols_sorted:
