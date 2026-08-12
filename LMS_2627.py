@@ -335,29 +335,52 @@ else:
 if "current_player" not in st.session_state:
     st.session_state["current_player"] = None
 
-import streamlit as st
 
 if "page" not in st.session_state:
     st.session_state.page = "Player Picks"
 
 def nav_button(label):
-    style = """
+    # Determine if this button is the active one
+    active = st.session_state.page == label
+    
+    # Inject CSS with two classes: normal + active
+    style = f"""
         <style>
-            .nav-btn {
+            .nav-btn {{
                 padding: 8px 12px;
                 border-radius: 6px;
                 background-color: #f5f5f5;
                 margin-bottom: 6px;
                 cursor: pointer;
-            }
-            .nav-btn:hover {
+                border: 1px solid #ddd;
+            }}
+            .nav-btn:hover {{
                 background-color: #e0e0e0;
-            }
+            }}
+
+            /* ACTIVE BUTTON STYLE */
+            .nav-btn-active {{
+                padding: 8px 12px;
+                border-radius: 12px;
+                background-color: #4A90E2;   /* blue highlight */
+                color: white;
+                margin-bottom: 6px;
+                cursor: pointer;
+                border: 1px solid #4A90E2;
+            }}
         </style>
     """
     st.sidebar.markdown(style, unsafe_allow_html=True)
 
-    if st.sidebar.button(label):
+    # Choose which class to use
+    btn_class = "nav-btn-active" if active else "nav-btn"
+
+    # Render the button using HTML instead of st.button
+    # so we can apply custom styling
+    if st.sidebar.markdown(
+        f"<div class='{btn_class}'>{label}</div>",
+        unsafe_allow_html=True
+    ):
         st.session_state.page = label
 
 nav_button("Player Picks")
@@ -368,7 +391,7 @@ st.write(f"Current page: {st.session_state.page}")
 if st.session_state.page == "Player Picks":
 
     choice = st.radio(
-        "Welcome to LMS — what would you like to do?",
+        "Please load your user page or create a new log in",
         ["Create New Entry", "Load Player Page"]
         )
 
