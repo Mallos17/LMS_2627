@@ -584,7 +584,7 @@ def build_leaderboard1(picks_dict):
     )
 
     # Drop sort key column
-    df = df.drop(columns=["_sort_key", "_alpha_key"])
+    #df = df.drop(columns=["_sort_key", "_alpha_key"])
 
     # Sort GW columns numerically
     gw_cols = [col for col in df.columns if col.startswith("GW ")]
