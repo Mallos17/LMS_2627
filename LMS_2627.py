@@ -378,13 +378,12 @@ def nav_button(label):
     # Choose which class to use
     btn_class = "nav-btn-active" if active else "nav-btn"
 
-    # Render the button using HTML instead of st.button
-    # so we can apply custom styling
-    if st.sidebar.markdown(
-        f"<div class='{btn_class}'>{label}</div>",
-        unsafe_allow_html=True
-    ):
-        st.session_state.page = label
+    # Render a styled container *around* the real button
+    with st.sidebar:
+        if st.button(label):
+            st.session_state.page = label
+
+        st.markdown(f"<div class='{btn_class}'>{label}</div>", unsafe_allow_html=True)
 
 nav_button("Player Picks")
 nav_button("Leaderboard")
