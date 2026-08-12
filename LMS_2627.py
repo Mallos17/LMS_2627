@@ -508,31 +508,50 @@ if st.session_state.page == "Player Picks":
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
-    
-    def build_leaderboard(picks_dict):
+
+    def build_leaderboard(picks_dict, badge_dict):
         rows = []
 
-        # Convert dictionary into row format
+        # Determine max GW so we know how many columns to create
+        all_gws = set()
+        for gw_dict in picks_dict.values():
+            all_gws.update(gw_dict.keys())
+        all_gws = sorted(all_gws, key=lambda x: int(x))
+        max_gw = max(int(gw) for gw in all_gws)
+
+        # Build rows
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
-            for gw, pick in gw_dict.items():
-                row[f"GW {gw}"] = pick
+
+            for gw in range(1, max_gw + 1):
+                gw_str = str(gw)
+                pick = gw_dict.get(gw_str, "")
+
+                if pick:
+                    badge = badge_dict.get(pick, None)
+                    if badge:
+                        pick_display = f"<img src='{badge}' width='28'> {pick}"
+                    else:
+                        pick_display = pick
+                else:
+                    pick_display = ""
+
+                row[f"GW {gw}"] = pick_display
+
             rows.append(row)
 
-        # Build DataFrame
         df = pd.DataFrame(rows)
 
-        # Sort columns: Player Name first, then GW 1, GW 2, ...
-        sorted_cols = ["Player Name"] + sorted(
-            [col for col in df.columns if col.startswith("GW ")],
-            key=lambda x: int(x.split()[1])
-            )
+        # Sort columns
+        gw_cols = [col for col in df.columns if col.startswith("GW ")]
+        gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
-        df = df[sorted_cols]
+        df = df[["Player Name"] + gw_cols_sorted]
 
         return df
 
-    leaderboard_df = build_leaderboard(picks)
-    st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
+    leaderboard_df = build_leaderboard(picks, prem_badges)
+    st.markdown(leaderboard_df.to_html(escape=False), unsafe_allow_html=True)
+
 
     
