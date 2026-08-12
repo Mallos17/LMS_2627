@@ -256,7 +256,7 @@ gw_end_dates = fixtures.groupby("GW")["Date"].max()
 gw_list = sorted(gw_start_dates.index)
 
 #today = dt.date.today()
-today = dt.date(2026,8,29)
+today = dt.date(2026,8,27)
 past_gws = gw_start_dates[gw_start_dates.dt.date <= today]
 
 current_gw = None
@@ -473,6 +473,7 @@ if st.session_state.page == "Player Picks":
             st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
             st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
         elif in_play and not existing_pick:
+            st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
             st.warning(f"No pick selected for for GW{current_gw}")
         elif not in_play and existing_pick:
             st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
