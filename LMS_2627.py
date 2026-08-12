@@ -358,22 +358,25 @@ st.session_state.page = choice
 # Style the active item
 st.sidebar.markdown("""
 <style>
-/* Make radio options look like buttons */
+/* Base button-like style */
 div[role="radiogroup"] > label {
     display: block;
     padding: 8px 12px;
     border-radius: 6px;
-    border: 1px solid #ddd;
-    background-color: #f5f5f5;
+    border: 1px solid var(--secondary-background-color);
+    background-color: var(--background-color);
     margin-bottom: 6px;
     cursor: pointer;
+
+    /* Text colour for inactive buttons */
+    color: var(--text-color);
 }
 
-/* Active option */
+/* ACTIVE option */
 div[role="radiogroup"] > label[data-selected="true"] {
-    background-color: #FFD700;
-    font-weight: bold;
-    color: black;
+    background-color: #FFD700 !important;   /* gold */
+    color: black !important;                /* readable in dark mode */
+    font-weight: bold !important;
 }
 </style>
 """, unsafe_allow_html=True)
