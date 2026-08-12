@@ -532,8 +532,9 @@ elif st.session_state.page == "Leaderboard":
 
         df = df[["Player Name"] + gw_cols_sorted]
         df = df.reset_index(drop=True)
+        
         return df
 
     leaderboard_df = build_leaderboard(picks)
-    st.markdown(leaderboard_df.to_html(escape=False), unsafe_allow_html=True)
+    st.markdown(leaderboard_df.to_html(index=False,escape=False), unsafe_allow_html=True)
     
