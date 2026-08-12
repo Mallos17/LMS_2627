@@ -513,6 +513,7 @@ elif st.session_state.page == "Leaderboard":
 
     st.header("Leaderboard")
     picks = load_picks_from_google()
+    st.markdown(picks)
 
     def build_leaderboard(picks_dict):
         rows = []
