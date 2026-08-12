@@ -512,33 +512,17 @@ elif st.session_state.page == "Leaderboard":
     def build_leaderboard(picks_dict):
         rows = []
 
-        # Determine max GW so we know how many columns to create
-        all_gws = set()
-        for gw_dict in picks_dict.values():
-            all_gws.update(gw_dict.keys())
-            all_gws = sorted(all_gws, key=lambda x: int(x))
-            max_gw = max(int(gw) for gw in all_gws)
-
-        # Build rows
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
-
-            for gw in range(1, max_gw + 1):
-                gw_str = str(gw)
-                pick = gw_dict.get(gw_str, "")
-
-                if pick:
-                    # Insert your badge HTML
-                    badge_html = badge_html_home(pick)
-                    row[f"GW {gw}"] = f"{badge_html} {pick}"
-                else:
-                    row[f"GW {gw}"] = ""
-
+            for gw, pick in gw_dict.items():
+                row[f"GW {gw}"] = pick
             rows.append(row)
+
+        if not rows:
+            return pd.DataFrame(columns=["Player Name"])
 
         df = pd.DataFrame(rows)
 
-        # Sort columns
         gw_cols = [col for col in df.columns if col.startswith("GW ")]
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
@@ -546,9 +530,6 @@ elif st.session_state.page == "Leaderboard":
 
         return df
 
-
     leaderboard_df = build_leaderboard(picks)
-    st.markdown(leaderboard_df.to_html(escape=False), unsafe_allow_html=True)
-
-
+    st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
     
