@@ -562,23 +562,18 @@ def build_leaderboard1(picks_dict):
     ]
     freq = Counter(latest_raw_picks)
 
-    # Build rows
+    # Build rows WITHOUT badges
     for player, gw_dict in picks_dict.items():
         row = {"Player Name": player}
 
-        # Add GW columns (HTML for display)
+        # Raw picks only
         for gw, pick in gw_dict.items():
-            if pick:
-                html = f"{badge_html_home(pick)} {pick}"
-                row[f"GW {gw}"] = html
-            else:
-                row[f"GW {gw}"] = ""
+            row[f"GW {gw}"] = pick or ""
 
-        # Sorting keys use RAW team name
+        # Sorting keys (raw)
         raw_latest_pick = gw_dict.get(latest_gw_str, "") or ""
-
-        row["_freq"] = freq[raw_latest_pick]          # popularity
-        row["_alpha"] = raw_latest_pick.lower()       # alphabetical
+        row["_freq"] = freq[raw_latest_pick]
+        row["_alpha"] = raw_latest_pick.lower()
 
         rows.append(row)
 
@@ -599,6 +594,12 @@ def build_leaderboard1(picks_dict):
     gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
     df = df[["Player Name"] + gw_cols_sorted]
+
+    # ⭐ NOW add badges AFTER sorting
+    for col in gw_cols_sorted:
+        df[col] = df[col].apply(
+            lambda team: f"{badge_html_home(team)} {team}" if team else ""
+        )
 
     return df
 
