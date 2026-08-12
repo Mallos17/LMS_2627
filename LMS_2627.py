@@ -596,10 +596,10 @@ def build_leaderboard1(picks_dict):
     df = df[["Player Name"] + gw_cols_sorted]
 
     # ⭐ NOW add badges AFTER sorting
-    for col in gw_cols_sorted:
-        df[col] = df[col].apply(
-            lambda team: f"{badge_html_home(team)} {team}" if team else ""
-        )
+    #for col in gw_cols_sorted:
+    #    df[col] = df[col].apply(
+    #        lambda team: f"{badge_html_home(team)} {team}" if team else ""
+    #    )
 
     return df
 
