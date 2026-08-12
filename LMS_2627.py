@@ -394,6 +394,8 @@ div[role="radiogroup"] > label[data-selected="true"] {
 
 #st.write(f"Current page: {st.session_state.page}")
 
+from collections import Counter
+
 if st.session_state.page == "Player Picks":
 
     choice = st.radio(
@@ -505,9 +507,10 @@ if st.session_state.page == "Player Picks":
         st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-from collections import Counter
+
 
 elif st.session_state.page == "Leaderboard":
+
     st.header("Leaderboard")
     picks = load_picks_from_google()
 
