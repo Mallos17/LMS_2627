@@ -549,55 +549,50 @@ elif st.session_state.page == "Leaderboard":
 def build_leaderboard1(picks_dict):
     rows = []
 
-    # Determine most recent GW
+    # Determine latest GW that ANY player actually picked
     all_gws = set()
     for gw_dict in picks_dict.values():
-        all_gws.update(gw_dict.keys())
+        all_gws.update([gw for gw in gw_dict.keys() if gw_dict[gw]])
     latest_gw = max(int(gw) for gw in all_gws)
+    latest_gw_str = str(latest_gw)
 
-    # Count frequency of picks in latest GW
-    latest_picks = [
-        gw_dict.get(str(latest_gw), "")
-        for gw_dict in picks_dict.values()
-    ]
+    # Count frequency of picks in that GW
+    latest_picks = []
+    for gw_dict in picks_dict.values():
+        pick = gw_dict.get(latest_gw_str, "")
+        latest_picks.append(pick if pick else "")
     freq = Counter(latest_picks)
-    for player, gw_dict in picks_dict.items():
-        st.text(print(player, gw_dict.get(str(latest_gw))))
 
     # Build rows
     for player, gw_dict in picks_dict.items():
         row = {"Player Name": player}
 
+        # Add GW columns with badges
         for gw, pick in gw_dict.items():
             if pick:
-                row[f"GW {gw}"] = f"{badge_html_home(pick)}"
+                row[f"GW {gw}"] = f"{badge_html_home(pick)} {pick}"
             else:
                 row[f"GW {gw}"] = ""
 
-        # Add sort key
-        player_latest_pick = gw_dict.get(str(latest_gw), "")
-        row["_sort_key"] = freq[player_latest_pick]
-        row["_alpha_key"] = player_latest_pick.lower()   # alphabetical
+        # Sorting keys
+        latest_pick = gw_dict.get(latest_gw_str, "")
+        row["_freq"] = freq[latest_pick]
+        row["_alpha"] = latest_pick.lower()
 
         rows.append(row)
 
     df = pd.DataFrame(rows)
 
     # Sort by popularity desc, alphabetical asc
-    df = df.sort_values(
-        by=["_sort_key", "_alpha_key"],
-        ascending=[False, True],
-        kind="mergesort"   # stable sort ensures consistent ordering
-    )
+    df = df.sort_values(["_freq", "_alpha"], ascending=[False, True], kind="mergesort")
 
-    # Drop sort key column
-    #df = df.drop(columns=["_sort_key", "_alpha_key"])
+    df = df.drop(columns=["_freq", "_alpha"])
 
     # Sort GW columns numerically
     gw_cols = [col for col in df.columns if col.startswith("GW ")]
     gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
-    #df = df[["Player Name"] + gw_cols_sorted]
+    df = df[["Player Name"] + gw_cols_sorted]
 
     return df
 
