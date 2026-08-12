@@ -206,7 +206,7 @@ def gw_nav():
 
     # RIGHT — Next GW + Go to Current GW
     with cols[2]:
-        right_cols = st.columns([1.5,1])
+        right_cols = st.columns([0.5,1])
 
         # Next GW button
         with right_cols[0]:
