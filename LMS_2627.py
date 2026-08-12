@@ -190,7 +190,7 @@ def gw_nav():
     cols = st.columns([1,2,3])   # widen the right side
 
     # LEFT BUTTON — Previous GW
-    with cols[0]:
+    with cols[1]:
         if idx > 0:
             prev_gw = gw_list[idx - 1]
             if st.button(f"◀ GW {prev_gw}"):
@@ -198,7 +198,7 @@ def gw_nav():
                 st.rerun()
 
     # MIDDLE — Current GW title
-    with cols[1]:
+    with cols[0]:
         st.markdown(
             f"<h3 style='text-align:center;'>Gameweek {st.session_state['selected_gw']}</h3>",
             unsafe_allow_html=True
