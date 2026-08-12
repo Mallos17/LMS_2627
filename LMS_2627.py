@@ -510,16 +510,16 @@ elif st.session_state.page == "Leaderboard":
     st.write(picks)
     leaderboard = {}
 
-    for entry in picks:
-        player = entry["player"]
-        pick = entry["pick"]
+    for player, gw_dict in picks.items():
+        # gw_dict looks like {"1": "Bournemouth"}
+        picks_list = list(gw_dict.values())  # extract all picks across GWs
+        leaderboard[player] = picks_list
 
-        leaderboard.setdefault(player, []).append(pick)
-        
     lb_df = pd.DataFrame([
-    {"player": player, "picks": picks}
-    for player, picks in leaderboard.items()
-    ])
+        {"player": player, "picks": ", ".join(picks)}   # join list into readable text
+        for player, picks in leaderboard.items()
+        ])
 
     st.dataframe(lb_df, use_container_width=True)
+
     
