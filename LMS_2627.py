@@ -507,5 +507,6 @@ if st.session_state.page == "Player Picks":
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
-    st.markdown(picks.to_html(index=False, escape=False), unsafe_allow_html=True)
+    lb_df = pd.DataFrame(picks)
+    st.markdown(lb_df.to_html(index=False, escape=False), unsafe_allow_html=True)
     
