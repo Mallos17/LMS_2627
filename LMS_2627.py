@@ -517,9 +517,9 @@ elif st.session_state.page == "Leaderboard":
             for gw, pick in gw_dict.items():
                 # Add badge HTML using your existing function
                 if pick:
-                    row[f"GW {gw}"] = f"{badge_html_home(pick)}"
+                    row[f"Gameweek {gw}"] = f"{badge_html_home(pick)}"
                 else:
-                    row[f"GW {gw}"] = ""
+                    row[f"Gameweek {gw}"] = ""
             rows.append(row)
 
         if not rows:
@@ -537,4 +537,59 @@ elif st.session_state.page == "Leaderboard":
 
     leaderboard_df = build_leaderboard(picks)
     st.markdown(leaderboard_df.to_html(index=False,escape=False), unsafe_allow_html=True)
+
+
+from collections import Counter
+
+def build_leaderboard1(picks_dict):
+    rows = []
+
+    # Determine most recent GW
+    all_gws = set()
+    for gw_dict in picks_dict.values():
+        all_gws.update(gw_dict.keys())
+    latest_gw = max(int(gw) for gw in all_gws)
+
+    # Count frequency of picks in latest GW
+    latest_picks = [
+        gw_dict.get(str(latest_gw), "")
+        for gw_dict in picks_dict.values()
+    ]
+    freq = Counter(latest_picks)
+
+    # Build rows
+    for player, gw_dict in picks_dict.items():
+        row = {"Player Name": player}
+
+        for gw, pick in gw_dict.items():
+            if pick:
+                row[f"GW {gw}"] = f"{badge_html_home(pick)} {pick}"
+            else:
+                row[f"GW {gw}"] = ""
+
+        # Add sort key
+        player_latest_pick = gw_dict.get(str(latest_gw), "")
+        row["_sort_key"] = freq[player_latest_pick]
+
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+
+    # Sort by frequency (descending)
+    df = df.sort_values("_sort_key", ascending=False)
+
+    # Drop sort key column
+    df = df.drop(columns=["_sort_key"])
+
+    # Sort GW columns numerically
+    gw_cols = [col for col in df.columns if col.startswith("GW ")]
+    gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
+
+    df = df[["Player Name"] + gw_cols_sorted]
+
+    return df
+
+leaderboard_df1 = build_leaderboard1(picks)
+st.markdown(leaderboard_df1.to_html(escape=False, index=False), unsafe_allow_html=True)
+
     
