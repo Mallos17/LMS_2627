@@ -458,8 +458,8 @@ if st.session_state.page == "Player Picks":
                 st.rerun()
 
     # --- BLOCK IF NO PLAYER LOGGED IN ---
-    if st.session_state["current_player"] is None:
-        st.stop()
+    #if st.session_state["current_player"] is None:
+    #    st.stop()
 
     player = st.session_state["current_player"]
     st.markdown(f"Logged in as: **{player}**")
