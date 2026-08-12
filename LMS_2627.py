@@ -389,27 +389,6 @@ div[role="radiogroup"] > label[data-selected="true"] {
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-
-@media (max-width: 768px) {
-
-    /* Make tables scroll horizontally instead of overflow */
-    .mobile-table {
-        overflow-x: auto;
-        display: block;
-        width: 100%;
-    }
-
-    /* Reduce font size slightly for mobile */
-    .mobile-table table {
-        font-size: 0.85rem;
-    }
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 #nav_button("Player Picks")
 #nav_button("Leaderboard")
 
@@ -468,9 +447,12 @@ if st.session_state.page == "Player Picks":
     # --- BLOCK IF NO PLAYER LOGGED IN ---
     #if st.session_state["current_player"] is None:
     #    st.stop()
-
+    
     player = st.session_state["current_player"]
-    st.markdown(f"Logged in as: **{player}**")
+    if player is None:
+        st.markdown("Not logged in")
+    else:
+        st.markdown(f"Logged in as: **{player}**")
     
     picks = load_picks_from_google()
     player_picks = picks.get(player, {})
