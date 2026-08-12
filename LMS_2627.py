@@ -169,7 +169,15 @@ def prepare_results_table(df):
     # Apply right alignment to Home column
     df["Home"] = df["Home"].apply(lambda x: f"<div style='text-align:left;'>{x}</div>")
     df["Away"] = df["Away"].apply(lambda x: f"<div style='text-align:right;'>{x}</div>")
-
+    
+    if df['HS'].isna().any():
+        df = df.drop(columns=['HS'])
+    if df['AS'].isna().any():
+        df = df.drop(columns=['AS'])
+        
+    df["HS"] = df["HS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+    df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+    
     return df
 
 def gw_nav():
