@@ -563,23 +563,27 @@ def build_leaderboard1(picks_dict):
 
         for gw, pick in gw_dict.items():
             if pick:
-                row[f"GW {gw}"] = f"{badge_html_home(pick)} {pick}"
+                row[f"GW {gw}"] = f"{badge_html_home(pick)}"
             else:
                 row[f"GW {gw}"] = ""
 
         # Add sort key
         player_latest_pick = gw_dict.get(str(latest_gw), "")
         row["_sort_key"] = freq[player_latest_pick]
+        row["_alpha_key"] = player_latest_pick.lower()   # alphabetical
 
         rows.append(row)
 
     df = pd.DataFrame(rows)
 
-    # Sort by frequency (descending)
-    df = df.sort_values("_sort_key", ascending=False)
+    # Sort by popularity desc, alphabetical asc
+    df = df.sort_values(
+        ["_sort_key", "_alpha_key"],
+        ascending=[False, True]
+    )
 
     # Drop sort key column
-    df = df.drop(columns=["_sort_key"])
+    df = df.drop(columns=["_sort_key", "_alpha_key"])
 
     # Sort GW columns numerically
     gw_cols = [col for col in df.columns if col.startswith("GW ")]
