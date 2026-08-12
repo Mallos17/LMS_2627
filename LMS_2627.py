@@ -516,10 +516,11 @@ elif st.session_state.page == "Leaderboard":
         leaderboard[player] = picks_list
 
     lb_df = pd.DataFrame([
-        {"player": player, "picks": ", ".join(picks)}   # join list into readable text
-        for player, picks in leaderboard.items()
-        ])
+    {"player": player, **gw_dict}
+    for player, gw_dict in picks.items()
+    ])
 
     st.dataframe(lb_df, use_container_width=True)
+
 
     
