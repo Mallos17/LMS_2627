@@ -578,7 +578,7 @@ def build_leaderboard1(picks_dict):
 
     # Sort by popularity desc, alphabetical asc
     df = df.sort_values(
-        by=["_freq", "_alpha"],
+        by=["_sort_key", "_alpha_key"],
         ascending=[False, True],
         kind="mergesort"   # stable sort ensures consistent ordering
     )
