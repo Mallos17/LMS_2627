@@ -552,23 +552,22 @@ def build_leaderboard1(picks_dict):
     all_real_gws = set()
     for gw_dict in picks_dict.values():
         for gw, pick in gw_dict.items():
-            if pick not in (None, "", " "):   # only count real picks
-                all_real_gws.add(int(gw))
+            if pick not in (None, "", " "):
+                all_real_gws.add(gw)   # <-- keep gw as INT
 
     latest_gw = max(all_real_gws)
-    latest_gw_str = str(latest_gw)
 
     # Count frequency using RAW team names
     latest_raw_picks = []
     for gw_dict in picks_dict.values():
-        pick = gw_dict.get(latest_gw_str, "")
+        pick = gw_dict.get(latest_gw, "")   # <-- use INT key
         latest_raw_picks.append(pick if pick else "")
 
     freq = Counter(latest_raw_picks)
 
     # Debug: now this WILL show real picks
     for player, gw_dict in picks_dict.items():
-        st.text(f"{player}: {gw_dict.get(latest_gw_str)}")
+        st.text(f"{player}: {gw_dict.get(latest_gw)}")   # <-- INT key
 
     # Build rows WITHOUT badges
     for player, gw_dict in picks_dict.items():
@@ -579,7 +578,7 @@ def build_leaderboard1(picks_dict):
             row[f"GW {gw}"] = pick or ""
 
         # Sorting keys (raw)
-        raw_latest_pick = gw_dict.get(latest_gw_str, "") or ""
+        raw_latest_pick = gw_dict.get(latest_gw, "") or ""
         row["_freq"] = freq[raw_latest_pick]
         row["_alpha"] = raw_latest_pick.lower()
 
