@@ -341,14 +341,12 @@ if "page" not in st.session_state:
 
 def nav_button(label):
     active = st.session_state.page == label
-
-    # Unique class name for each button
-    class_name = label.lower().replace(" ", "-")
-
-    # CSS for normal + active buttons
+    
+    # CSS that targets the button by its aria-label (stable across reruns)
     st.sidebar.markdown(f"""
         <style>
-            div.stButton > button.{class_name} {{
+            /* Base button style */
+            button[aria-label="{label}"] {{
                 width: 100%;
                 text-align: left;
                 padding: 8px 12px;
@@ -357,36 +355,35 @@ def nav_button(label):
                 background-color: #f5f5f5;
                 color: black;
                 font-weight: normal;
-                cursor: pointer;
             }}
 
-            div.stButton > button.{class_name}:hover {{
+            button[aria-label="{label}"]:hover {{
                 background-color: #e0e0e0;
             }}
 
             /* ACTIVE BUTTON STYLE — GOLD + BLACK + BOLD */
-            div.stButton > button.{class_name}.active {{
-                background-color: #FFD700;   /* gold */
-                color: black;
-                font-weight: bold;
-                border: 1px solid #DAA520;   /* darker gold border */
+            button[aria-label="{label}"].active {{
+                background-color: #FFD700 !important;
+                color: black !important;
+                font-weight: bold !important;
+                border: 1px solid #DAA520 !important;
             }}
         </style>
     """, unsafe_allow_html=True)
 
     # Render the real button
-    clicked = st.sidebar.button(label, key=label, help="", type="secondary")
+    clicked = st.sidebar.button(label)
 
-    # If clicked, update page
+    # Update active page
     if clicked:
         st.session_state.page = label
 
-    # Now apply the active class via JS
+    # Apply active class using a tiny JS snippet
     if active:
         st.sidebar.markdown(
             f"""
             <script>
-            const btn = window.parent.document.querySelector('button[key="{label}"]');
+            const btn = window.parent.document.querySelector('button[aria-label="{label}"]');
             if (btn) btn.classList.add('active');
             </script>
             """,
