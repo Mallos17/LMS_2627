@@ -540,7 +540,7 @@ elif st.session_state.page == "Leaderboard":
 
             # Raw picks only
             for gw, pick in gw_dict.items():
-                row[f"GW {gw}"] = pick or ""
+                row[f"Gameweek {gw}"] = pick or ""
 
             # Sorting keys (raw)
             raw_latest_pick = gw_dict.get(latest_gw, "") or ""
