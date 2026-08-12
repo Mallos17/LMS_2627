@@ -187,40 +187,37 @@ def gw_nav():
     # Always recalc index based on current selected GW
     idx = gw_list.index(st.session_state["selected_gw"])
 
-    cols = st.columns([1.2,1,1])   # widen the right side
+    # 4 columns: Title, Prev, Next, Current
+    col_title, col_prev, col_next, col_current = st.columns([2, 1, 1, 1])
 
-    # LEFT BUTTON — Previous GW
-    with cols[1]:
-        if idx > 0:
-            prev_gw = gw_list[idx - 1]
-            if st.button(f"◀ GW {prev_gw}"):
-                st.session_state["selected_gw"] = prev_gw
-                st.rerun()
-
-    # MIDDLE — Current GW title
-    with cols[0]:
+    # TITLE
+    with col_title:
         st.markdown(
             f"<h3 style='text-align:center;'>Gameweek {st.session_state['selected_gw']}</h3>",
             unsafe_allow_html=True
         )
 
-    # RIGHT — Next GW + Go to Current GW
-    with cols[2]:
-        right_cols = st.columns([1,1])
-
-        # Next GW button
-        with right_cols[0]:
-            if idx + 1 < len(gw_list):
-                next_gw = gw_list[idx + 1]
-                if st.button(f"GW {next_gw} ▶"):
-                    st.session_state["selected_gw"] = next_gw
-                    st.rerun()
-
-        # Go to Current GW button
-        with right_cols[1]:
-            if st.button("Current GW"):
-                st.session_state["selected_gw"] = current_gw
+    # PREV GW
+    with col_prev:
+        if idx > 0:
+            prev_gw = gw_list[idx - 1]
+            if st.button(f"◀ GW {prev_gw}", key="prev_gw"):
+                st.session_state["selected_gw"] = prev_gw
                 st.rerun()
+
+    # NEXT GW
+    with col_next:
+        if idx + 1 < len(gw_list):
+            next_gw = gw_list[idx + 1]
+            if st.button(f"GW {next_gw} ▶", key="next_gw"):
+                st.session_state["selected_gw"] = next_gw
+                st.rerun()
+
+    # CURRENT GW
+    with col_current:
+        if st.button("Current GW", key="current_gw"):
+            st.session_state["selected_gw"] = current_gw
+            st.rerun()
                 
 results_display = prepare_results_table(fixtures)
 
