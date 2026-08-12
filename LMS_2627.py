@@ -256,7 +256,7 @@ gw_end_dates = fixtures.groupby("GW")["Date"].max()
 gw_list = sorted(gw_start_dates.index)
 
 #today = dt.date.today()
-today = dt.date(2026,8,22)
+today = dt.date(2026,8,29)
 past_gws = gw_start_dates[gw_start_dates.dt.date <= today]
 
 current_gw = None
@@ -507,7 +507,6 @@ if st.session_state.page == "Player Picks":
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
-    st.write(picks)
     
     def build_leaderboard(picks_dict):
         rows = []
