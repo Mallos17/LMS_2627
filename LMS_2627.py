@@ -561,7 +561,7 @@ def build_leaderboard1(picks_dict):
     ]
     freq = Counter(latest_picks)
     for player, gw_dict in picks_dict.items():
-        print(player, gw_dict.get(str(latest_gw)))
+        st.text(print(player, gw_dict.get(str(latest_gw))))
 
     # Build rows
     for player, gw_dict in picks_dict.items():
