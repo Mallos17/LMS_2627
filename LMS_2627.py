@@ -478,33 +478,34 @@ if st.session_state.page == "Player Picks":
     )
     
     # Display
-    if in_play and existing_pick:
-        st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
-        st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
-    elif in_play and not existing_pick:
-        st.warning(f"No pick selected for for GW{current_gw}")
-    elif not in_play and existing_pick:
-        st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
-        st.markdown(f"**{countdown_text}**")
-        st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
-    elif not in_play and not existing_pick:
-        st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
-        st.markdown(f"**{countdown_text}**")
+    if st.session_state["current_player"] is not None:
+        if in_play and existing_pick:
+            st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
+            st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
+        elif in_play and not existing_pick:
+            st.warning(f"No pick selected for for GW{current_gw}")
+        elif not in_play and existing_pick:
+            st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+            st.markdown(f"**{countdown_text}**")
+            st.warning(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
+        elif not in_play and not existing_pick:
+            st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+            st.markdown(f"**{countdown_text}**")
     
-        # --- 6. Pick a team ---
-        teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
-        pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
+            # --- 6. Pick a team ---
+            teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
+            pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
 
-        # --- 8. Confirm pick ---
-        if st.button("Confirm Pick"):
-            st.success(f"You have picked **{pick.upper()}** for Gameweek {current_gw}")
-            save_pick_to_google(player, current_gw, pick)
-            st.cache_data.clear()
+            # --- 8. Confirm pick ---
+            if st.button("Confirm Pick"):
+                st.success(f"You have picked **{pick.upper()}** for Gameweek {current_gw}")
+                save_pick_to_google(player, current_gw, pick)
+                st.cache_data.clear()
         
-        # --- 7. Used teams (example) ---
-        used_teams = ["Arsenal", "Chelsea"]
-        st.markdown("### Teams not available to you:")
-        st.write(", ".join(used_teams))
+            # --- 7. Used teams (example) ---
+            used_teams = ["Arsenal", "Chelsea"]
+            st.markdown("### Teams not available to you:")
+            st.write(", ".join(used_teams))
 
     gw_nav()
     
