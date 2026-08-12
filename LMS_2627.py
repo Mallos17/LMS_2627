@@ -356,28 +356,29 @@ choice = st.sidebar.radio(
 st.session_state.page = choice
 
 # CSS that works in BOTH light and dark mode
-st.sidebar.markdown("""
+st.markdown("""
 <style>
 
-div[role="radiogroup"] > label {
-    display: block;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--secondary-background-color);
-    background-color: var(--background-color);
-    margin-bottom: 6px;
-    cursor: pointer;
+@media (max-width: 768px) {
 
-    /* Inactive text colour — works in dark mode */
-    color: var(--text-color) !important;
-}
+    /* Make sidebar push content instead of overlap */
+    section[data-testid="stSidebar"] {
+        position: relative !important;
+        width: 70% !important;          /* mobile-friendly width */
+        min-width: 70% !important;
+        max-width: 70% !important;
+        z-index: 2 !important;
+    }
 
-/* ACTIVE option */
-div[role="radiogroup"] > label[data-selected="true"] {
-    background-color: #FFD700 !important;   /* gold */
-    color: #000000 !important;              /* FORCE black text */
-    font-weight: 800 !important;            /* bold */
-    text-transform: uppercase !important;   /* uppercase */
+    /* Shift main content when sidebar is open */
+    div[data-testid="stAppViewContainer"] {
+        margin-left: 70% !important;
+    }
+
+    /* Prevent weird horizontal scrolling */
+    body {
+        overflow-x: hidden !important;
+    }
 }
 
 </style>
