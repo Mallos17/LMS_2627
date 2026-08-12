@@ -386,7 +386,7 @@ div[role="radiogroup"] > label[data-selected="true"] {
 #nav_button("Player Picks")
 #nav_button("Leaderboard")
 
-st.write(f"Current page: {st.session_state.page}")
+#st.write(f"Current page: {st.session_state.page}")
 
 if st.session_state.page == "Player Picks":
 
