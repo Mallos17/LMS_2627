@@ -340,50 +340,58 @@ if "page" not in st.session_state:
     st.session_state.page = "Player Picks"
 
 def nav_button(label):
-    # Determine if this button is the active one
     active = st.session_state.page == label
-    
-    # Inject CSS with two classes: normal + active
-    st.sidebar.markdown("""
+
+    # Assign a unique class name based on the label
+    class_name = label.lower().replace(" ", "-")
+
+    # Inject CSS once per button
+    st.sidebar.markdown(f"""
         <style>
-            .nav-btn {
-                padding: 8px 12px;
-                border-radius: 20px;
-                background-color: #f5f5f5;
-                margin-bottom: 6px;
-                cursor: pointer;
-                border: 1px solid #ddd;
+            /* Base button style */
+            div.stButton > button.{class_name} {{
+                width: 100%;
                 text-align: left;
-            }
-            .nav-btn-active {
                 padding: 8px 12px;
-                border-radius: 20px;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+                background-color: #f5f5f5;
+                color: black;
+                cursor: pointer;
+            }}
+
+            /* Hover */
+            div.stButton > button.{class_name}:hover {{
+                background-color: #e0e0e0;
+            }}
+
+            /* Active (highlighted) */
+            div.stButton > button.{class_name}.active {{
                 background-color: #4A90E2;
                 color: white;
-                margin-bottom: 6px;
-                cursor: pointer;
                 border: 1px solid #4A90E2;
-                text-align: left;
-            }
-            /* Remove default Streamlit button styling */
-            div.stButton > button {
-                width: 100%;
-                background: transparent;
-                border: none;
-                padding: 0;
-            }
+            }}
         </style>
     """, unsafe_allow_html=True)
 
-    # Choose which class to use
-    btn_class = "nav-btn-active" if active else "nav-btn"
+    # Render the real button
+    clicked = st.sidebar.button(label, key=label, help="", type="secondary")
 
-    # Render a styled container *around* the real button
-    with st.sidebar:
-        if st.button(label):
-            st.session_state.page = label
+    # If clicked, update page
+    if clicked:
+        st.session_state.page = label
 
-        st.markdown(f"<div class='{btn_class}'>{label}</div>", unsafe_allow_html=True)
+    # Now apply the active class via JS
+    if active:
+        st.sidebar.markdown(
+            f"""
+            <script>
+            const btn = window.parent.document.querySelector('button[key="{label}"]');
+            if (btn) btn.classList.add('active');
+            </script>
+            """,
+            unsafe_allow_html=True
+        )
 
 nav_button("Player Picks")
 nav_button("Leaderboard")
