@@ -345,44 +345,49 @@ pages = {
     "Leaderboard": "🏆"
 }
 
-# Radio menu (only one active)
-choice = st.sidebar.radio(
-    "Navigation",
-    list(pages.keys()),
-    format_func=lambda x: f"{pages[x]}  {x}"
-)
+# Wrap the radio in a uniquely identifiable container
+nav_container = st.sidebar.container()
+with nav_container:
+    choice = st.radio(
+        "Navigation",
+        list(pages.keys()),
+        format_func=lambda x: f"{pages[x]}  {x}",
+        key="nav_radio"
+    )
 
-# Store active page
 st.session_state.page = choice
 
-# CSS that works in BOTH light and dark mode
-st.markdown("""
+# Scoped CSS — ONLY affects the nav radio
+st.sidebar.markdown("""
 <style>
 
-@media (max-width: 768px) {
+#nav_radio_container div[role="radiogroup"] > label {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--secondary-background-color);
+    background-color: var(--background-color);
+    margin-bottom: 6px;
+    cursor: pointer;
+    color: var(--text-color) !important;
+}
 
-    /* Make sidebar push content instead of overlap */
-    section[data-testid="stSidebar"] {
-        position: relative !important;
-        width: 70% !important;          /* mobile-friendly width */
-        min-width: 70% !important;
-        max-width: 70% !important;
-        z-index: 2 !important;
-    }
-
-    /* Shift main content when sidebar is open */
-    div[data-testid="stAppViewContainer"] {
-        margin-left: 70% !important;
-    }
-
-    /* Prevent weird horizontal scrolling */
-    body {
-        overflow-x: hidden !important;
-    }
+/* ACTIVE option */
+#nav_radio_container div[role="radiogroup"] > label[data-selected="true"] {
+    background-color: #FFD700 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
+# Attach an ID to the container so CSS can target it
+nav_container.markdown(
+    "<div id='nav_radio_container'></div>",
+    unsafe_allow_html=True
+)
 
 st.markdown("""
 <style>
@@ -510,8 +515,11 @@ if st.session_state.page == "Player Picks":
         st.write(", ".join(used_teams))
 
     gw_nav()
-
-    st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
-
+    
+    with st.container():
+        st.markdown('<div class="mobile-table">', unsafe_allow_html=True)
+        st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
