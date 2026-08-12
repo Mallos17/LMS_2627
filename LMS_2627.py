@@ -559,7 +559,7 @@ elif st.session_state.page == "Leaderboard":
             )
     
         for col in df.columns:
-            if col.startswith("GW "):
+            if col.startswith("Gameweek "):
                 df[col] = df[col].apply(
                     lambda team: f"{badge_html_home(team)}" if team else ""
                     )
