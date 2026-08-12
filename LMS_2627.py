@@ -339,37 +339,43 @@ if "current_player" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page = "Player Picks"
 
-pages = ["Player Picks", "Leaderboard"]
+# Sidebar navigation
+pages = {
+    "Player Picks": "⭐",
+    "Leaderboard": "🏆"
+}
 
-# Render buttons
-for label in pages:
-    if st.sidebar.button(label):
-        st.session_state.page = label
+# Radio menu (only one active)
+choice = st.sidebar.radio(
+    "Navigation",
+    list(pages.keys()),
+    format_func=lambda x: f"{pages[x]}  {x}"
+)
 
-# Determine active button index
-active_index = pages.index(st.session_state.page) + 1  # nth-of-type is 1-based
+# Store active page
+st.session_state.page = choice
 
-# Apply CSS to uppercase ONLY the active button
-st.sidebar.markdown(f"""
-    <style>
-        /* Base button style */
-        div.stButton > button {{
-            width: 100%;
-            text-align: left;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            background-color: #f5f5f5;
-            color: black;
-            font-weight: normal;
-        }}
+# Style the active item
+st.sidebar.markdown("""
+<style>
+/* Make radio options look like buttons */
+div[role="radiogroup"] > label {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
 
-        /* ACTIVE BUTTON — uppercase + bold */
-        div.stButton:nth-of-type({active_index}) > button {{
-            text-transform: uppercase !important;
-            font-weight: bold !important;
-        }}
-    </style>
+/* Active option */
+div[role="radiogroup"] > label[data-selected="true"] {
+    background-color: #FFD700;
+    font-weight: bold;
+    color: black;
+}
+</style>
 """, unsafe_allow_html=True)
 
 #nav_button("Player Picks")
