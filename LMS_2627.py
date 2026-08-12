@@ -513,104 +513,73 @@ elif st.session_state.page == "Leaderboard":
 
     st.header("Leaderboard")
     picks = load_picks_from_google()
-    st.markdown(picks)
 
     def build_leaderboard(picks_dict):
         rows = []
 
+        # Determine latest GW that actually has picks
+        all_real_gws = set()
+        for gw_dict in picks_dict.values():
+            for gw, pick in gw_dict.items():
+                if pick not in (None, "", " "):
+                    all_real_gws.add(gw)   # <-- keep gw as INT
+
+        latest_gw = max(all_real_gws)
+
+        # Count frequency using RAW team names
+        latest_raw_picks = []
+        for gw_dict in picks_dict.values():
+            pick = gw_dict.get(latest_gw, "")   # <-- use INT key
+            latest_raw_picks.append(pick if pick else "")
+
+        freq = Counter(latest_raw_picks)
+
+        # Debug: now this WILL show real picks
+        for player, gw_dict in picks_dict.items():
+            st.text(f"{player}: {gw_dict.get(latest_gw)}")   # <-- INT key
+
+        # Build rows WITHOUT badges
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
-            for gw, pick in gw_dict.items():
-                # Add badge HTML using your existing function
-                if pick:
-                    row[f"Gameweek {gw}"] = f"{badge_html_home(pick)}"
-                else:
-                    row[f"Gameweek {gw}"] = ""
-            rows.append(row)
 
-        if not rows:
-            return pd.DataFrame(columns=["Player Name"])
+            # Raw picks only
+            for gw, pick in gw_dict.items():
+                row[f"GW {gw}"] = pick or ""
+
+            # Sorting keys (raw)
+            raw_latest_pick = gw_dict.get(latest_gw, "") or ""
+            row["_freq"] = freq[raw_latest_pick]
+            row["_alpha"] = raw_latest_pick.lower()
+
+            rows.append(row)
 
         df = pd.DataFrame(rows)
 
+        # Sort by popularity desc, alphabetical asc
+        df = df.sort_values(
+            ["_freq", "_alpha"],
+            ascending=[False, True],
+            kind="mergesort"
+            )
+    
+        for col in df.columns:
+            if col.startswith("GW "):
+                df[col] = df[col].apply(
+                    lambda team: f"{badge_html_home(team)}" if team else ""
+                    )
+            
+        # Drop helper columns
+        df = df.drop(columns=["_freq", "_alpha"])
+
+        # Sort GW columns numerically
         gw_cols = [col for col in df.columns if col.startswith("GW ")]
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
         df = df[["Player Name"] + gw_cols_sorted]
-        df = df.reset_index(drop=True)
-        
+    
         return df
 
     leaderboard_df = build_leaderboard(picks)
-    st.markdown(leaderboard_df.to_html(index=False,escape=False), unsafe_allow_html=True)
-
-
-def build_leaderboard1(picks_dict):
-    rows = []
-
-    # Determine latest GW that actually has picks
-    all_real_gws = set()
-    for gw_dict in picks_dict.values():
-        for gw, pick in gw_dict.items():
-            if pick not in (None, "", " "):
-                all_real_gws.add(gw)   # <-- keep gw as INT
-
-    latest_gw = max(all_real_gws)
-
-    # Count frequency using RAW team names
-    latest_raw_picks = []
-    for gw_dict in picks_dict.values():
-        pick = gw_dict.get(latest_gw, "")   # <-- use INT key
-        latest_raw_picks.append(pick if pick else "")
-
-    freq = Counter(latest_raw_picks)
-
-    # Debug: now this WILL show real picks
-    for player, gw_dict in picks_dict.items():
-        st.text(f"{player}: {gw_dict.get(latest_gw)}")   # <-- INT key
-
-    # Build rows WITHOUT badges
-    for player, gw_dict in picks_dict.items():
-        row = {"Player Name": player}
-
-        # Raw picks only
-        for gw, pick in gw_dict.items():
-            row[f"GW {gw}"] = pick or ""
-
-        # Sorting keys (raw)
-        raw_latest_pick = gw_dict.get(latest_gw, "") or ""
-        row["_freq"] = freq[raw_latest_pick]
-        row["_alpha"] = raw_latest_pick.lower()
-
-        rows.append(row)
-
-    df = pd.DataFrame(rows)
-
-    # Sort by popularity desc, alphabetical asc
-    df = df.sort_values(
-        ["_freq", "_alpha"],
-        ascending=[False, True],
-        kind="mergesort"
-    )
-    
-    for col in df.columns:
-        if col.startswith("GW "):
-            df[col] = df[col].apply(
-                lambda team: f"{badge_html_home(team)}" if team else ""
-                )
-            
-    # Drop helper columns
-    df = df.drop(columns=["_freq", "_alpha"])
-
-    # Sort GW columns numerically
-    gw_cols = [col for col in df.columns if col.startswith("GW ")]
-    gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
-
-    df = df[["Player Name"] + gw_cols_sorted]
-    
-    return df
-
-leaderboard_df1 = build_leaderboard1(picks)
-st.markdown(leaderboard_df1.to_html(escape=False, index=False), unsafe_allow_html=True)
+    st.markdown(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     
