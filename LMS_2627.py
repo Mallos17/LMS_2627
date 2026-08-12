@@ -384,6 +384,27 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+
+@media (max-width: 768px) {
+
+    /* Make tables scroll horizontally instead of overflow */
+    .mobile-table {
+        overflow-x: auto;
+        display: block;
+        width: 100%;
+    }
+
+    /* Reduce font size slightly for mobile */
+    .mobile-table table {
+        font-size: 0.85rem;
+    }
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 #nav_button("Player Picks")
 #nav_button("Leaderboard")
 
