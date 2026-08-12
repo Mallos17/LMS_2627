@@ -172,13 +172,14 @@ def prepare_results_table(df):
     
     if df['HS'].isna().any():
         df = df.drop(columns=['HS'])
+    else:
+        df['HS'] = df['HS'].astype(int).astype(str)
+        df["HS"] = df["HS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     if df['AS'].isna().any():
         df = df.drop(columns=['AS'])
-    
-    df['HS'] = df['HS'].astype(int).astype(str)
-    df['AS'] = df['AS'].astype(int).astype(str)
-    df["HS"] = df["HS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
-    df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+    else:
+        df['AS'] = df['AS'].astype(int).astype(str)
+        df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     
     return df
 
