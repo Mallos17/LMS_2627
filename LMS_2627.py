@@ -344,13 +344,14 @@ if "page" not in st.session_state:
 pages = ["Player Picks", "Leaderboard"]
 
 # Render buttons and detect clicks
-for i, label in enumerate(pages):
+for label in pages:
     if st.sidebar.button(label):
         st.session_state.page = label
 
-# Now apply CSS based on which button is active
+# Find index of active page
 active_index = pages.index(st.session_state.page) + 1  # nth-child is 1-based
 
+# Apply CSS to highlight ONLY the active button
 st.sidebar.markdown(f"""
     <style>
         /* Base button style */
@@ -370,7 +371,7 @@ st.sidebar.markdown(f"""
         }}
 
         /* ACTIVE BUTTON — gold + bold + black text */
-        div.stButton:nth-child({active_index}) > button {{
+        div.stButton:nth-of-type({active_index}) > button {{
             background-color: #FFD700 !important;
             color: black !important;
             font-weight: bold !important;
