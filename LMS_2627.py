@@ -344,33 +344,36 @@ def nav_button(label):
     active = st.session_state.page == label
     
     # Inject CSS with two classes: normal + active
-    style = f"""
+    st.sidebar.markdown("""
         <style>
-            .nav-btn {{
+            .nav-btn {
                 padding: 8px 12px;
-                border-radius: 6px;
+                border-radius: 20px;
                 background-color: #f5f5f5;
                 margin-bottom: 6px;
                 cursor: pointer;
                 border: 1px solid #ddd;
-            }}
-            .nav-btn:hover {{
-                background-color: #e0e0e0;
-            }}
-
-            /* ACTIVE BUTTON STYLE */
-            .nav-btn-active {{
+                text-align: left;
+            }
+            .nav-btn-active {
                 padding: 8px 12px;
-                border-radius: 12px;
-                background-color: #4A90E2;   /* blue highlight */
+                border-radius: 20px;
+                background-color: #4A90E2;
                 color: white;
                 margin-bottom: 6px;
                 cursor: pointer;
                 border: 1px solid #4A90E2;
-            }}
+                text-align: left;
+            }
+            /* Remove default Streamlit button styling */
+            div.stButton > button {
+                width: 100%;
+                background: transparent;
+                border: none;
+                padding: 0;
+            }
         </style>
-    """
-    st.sidebar.markdown(style, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     # Choose which class to use
     btn_class = "nav-btn-active" if active else "nav-btn"
