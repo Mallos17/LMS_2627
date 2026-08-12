@@ -517,7 +517,7 @@ elif st.session_state.page == "Leaderboard":
             for gw, pick in gw_dict.items():
                 # Add badge HTML using your existing function
                 if pick:
-                    row[f"GW {gw}"] = f"{badge_html_home(pick)} {pick}"
+                    row[f"GW {gw}"] = f"{badge_html_home(pick)}"
                 else:
                     row[f"GW {gw}"] = ""
             rows.append(row)
