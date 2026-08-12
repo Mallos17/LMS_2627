@@ -533,6 +533,6 @@ elif st.session_state.page == "Leaderboard":
         return df
 
     leaderboard_df = build_leaderboard(picks)
-    st.dataframe(leaderboard_df, use_container_width=True)
+    st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
 
     
