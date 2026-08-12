@@ -592,6 +592,12 @@ def build_leaderboard1(picks_dict):
         ascending=[False, True],
         kind="mergesort"
     )
+    
+    for col in df.columns:
+        if col.startswith("GW "):
+            df[col] = df[col].apply(
+                lambda team: f"{badge_html_home(team)} {team}" if team else ""
+                )
 
     return df
 
