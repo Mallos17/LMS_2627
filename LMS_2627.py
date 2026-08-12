@@ -187,7 +187,7 @@ def gw_nav():
     # Always recalc index based on current selected GW
     idx = gw_list.index(st.session_state["selected_gw"])
 
-    cols = st.columns([2,1,1])   # widen the right side
+    cols = st.columns([2,0.5,2])   # widen the right side
 
     # LEFT BUTTON — Previous GW
     with cols[1]:
