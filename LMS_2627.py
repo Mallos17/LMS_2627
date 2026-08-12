@@ -596,9 +596,18 @@ def build_leaderboard1(picks_dict):
     for col in df.columns:
         if col.startswith("GW "):
             df[col] = df[col].apply(
-                lambda team: f"{badge_html_home(team)} {team}" if team else ""
+                lambda team: f"{badge_html_home(team)}" if team else ""
                 )
+            
+    # Drop helper columns
+    df = df.drop(columns=["_freq", "_alpha"])
 
+    # Sort GW columns numerically
+    gw_cols = [col for col in df.columns if col.startswith("GW ")]
+    gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
+
+    df = df[["Player Name"] + gw_cols_sorted]
+    
     return df
 
 leaderboard_df1 = build_leaderboard1(picks)
