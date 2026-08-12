@@ -547,7 +547,7 @@ elif st.session_state.page == "Leaderboard":
         return df
 
 
-    leaderboard_df = build_leaderboard(picks, prem_badges)
+    leaderboard_df = build_leaderboard(picks)
     st.markdown(leaderboard_df.to_html(escape=False), unsafe_allow_html=True)
 
 
