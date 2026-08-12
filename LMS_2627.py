@@ -188,7 +188,7 @@ def gw_nav():
     idx = gw_list.index(st.session_state["selected_gw"])
 
     # 4 columns: Title, Prev, Next, Current
-    col_title, col_prev, col_next, col_current = st.columns([2, 1, 1, 1])
+    col_title, col_prev, col_next, col_current = st.columns([2, 0.5, 0.5, 0.5])
 
     # TITLE
     with col_title:
