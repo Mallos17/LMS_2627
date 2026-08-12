@@ -548,22 +548,27 @@ elif st.session_state.page == "Leaderboard":
 def build_leaderboard1(picks_dict):
     rows = []
 
-    # Determine latest GW
-    all_gws = set()
+    # Determine latest GW that actually has picks
+    all_real_gws = set()
     for gw_dict in picks_dict.values():
-        all_gws.update(gw_dict.keys())
-    latest_gw = max(int(gw) for gw in all_gws)
+        for gw, pick in gw_dict.items():
+            if pick not in (None, "", " "):   # only count real picks
+                all_real_gws.add(int(gw))
+
+    latest_gw = max(all_real_gws)
     latest_gw_str = str(latest_gw)
 
     # Count frequency using RAW team names
-    latest_raw_picks = [
-        gw_dict.get(latest_gw_str, "") or ""
-        for gw_dict in picks_dict.values()
-    ]
+    latest_raw_picks = []
+    for gw_dict in picks_dict.values():
+        pick = gw_dict.get(latest_gw_str, "")
+        latest_raw_picks.append(pick if pick else "")
+
     freq = Counter(latest_raw_picks)
-    
+
+    # Debug: now this WILL show real picks
     for player, gw_dict in picks_dict.items():
-        st.text(print(player, gw_dict.get(str(latest_gw))))
+        st.text(f"{player}: {gw_dict.get(latest_gw_str)}")
 
     # Build rows WITHOUT badges
     for player, gw_dict in picks_dict.items():
@@ -588,21 +593,6 @@ def build_leaderboard1(picks_dict):
         ascending=[False, True],
         kind="mergesort"
     )
-
-    # Drop helper columns
-    #df = df.drop(columns=["_freq", "_alpha"])
-
-    # Sort GW columns numerically
-    gw_cols = [col for col in df.columns if col.startswith("GW ")]
-    gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
-
-    #df = df[["Player Name"] + gw_cols_sorted]
-
-    # ⭐ NOW add badges AFTER sorting
-    #for col in gw_cols_sorted:
-    #    df[col] = df[col].apply(
-    #        lambda team: f"{badge_html_home(team)} {team}" if team else ""
-    #    )
 
     return df
 
