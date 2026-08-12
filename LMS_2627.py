@@ -507,6 +507,18 @@ if st.session_state.page == "Player Picks":
 elif st.session_state.page == "Leaderboard":
     st.header("You 'Ornsssssssssssssssss!")
     picks = load_picks_from_google()
-    lb_df = pd.DataFrame(picks)
-    st.markdown(lb_df.to_html(index=False, escape=False), unsafe_allow_html=True)
+    leaderboard = {}
+
+    for entry in picks:
+        player = entry["player"]
+        pick = entry["pick"]
+
+        leaderboard.setdefault(player, []).append(pick)
+        
+    lb_df = pd.DataFrame([
+    {"player": player, "picks": picks}
+    for player, picks in leaderboard.items()
+    ])
+
+    st.dataframe(lb_df, use_container_width=True)
     
