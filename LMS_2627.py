@@ -506,7 +506,7 @@ if st.session_state.page == "Player Picks":
         st.markdown('</div>', unsafe_allow_html=True)
     
 elif st.session_state.page == "Leaderboard":
-    st.header("You 'Ornsssssssssssssssss!")
+    st.header("Leaderboard")
     picks = load_picks_from_google()
 
     def build_leaderboard(picks_dict):
@@ -515,7 +515,11 @@ elif st.session_state.page == "Leaderboard":
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
             for gw, pick in gw_dict.items():
-                row[f"GW {gw}"] = pick
+                # Add badge HTML using your existing function
+                if pick:
+                    row[f"GW {gw}"] = f"{badge_html_home(pick)} {pick}"
+                else:
+                    row[f"GW {gw}"] = ""
             rows.append(row)
 
         if not rows:
@@ -531,5 +535,5 @@ elif st.session_state.page == "Leaderboard":
         return df
 
     leaderboard_df = build_leaderboard(picks)
-    st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
+    st.markdown(leaderboard_df.to_html(escape=False), unsafe_allow_html=True)
     
