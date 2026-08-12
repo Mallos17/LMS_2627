@@ -487,7 +487,7 @@ if st.session_state.page == "Player Picks":
         st.markdown("### Teams not available to you:")
         st.write(", ".join(used_teams))
 
-    #gw_nav()
+    gw_nav()
 
     st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
 
