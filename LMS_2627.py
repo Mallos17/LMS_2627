@@ -534,10 +534,6 @@ elif st.session_state.page == "Leaderboard":
 
         freq = Counter(latest_raw_picks)
 
-        # Debug: now this WILL show real picks
-        for player, gw_dict in picks_dict.items():
-            st.text(f"{player}: {gw_dict.get(latest_gw)}")   # <-- INT key
-
         # Build rows WITHOUT badges
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
