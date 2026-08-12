@@ -342,13 +342,12 @@ if "page" not in st.session_state:
 def nav_button(label):
     active = st.session_state.page == label
 
-    # Assign a unique class name based on the label
+    # Unique class name for each button
     class_name = label.lower().replace(" ", "-")
 
-    # Inject CSS once per button
+    # CSS for normal + active buttons
     st.sidebar.markdown(f"""
         <style>
-            /* Base button style */
             div.stButton > button.{class_name} {{
                 width: 100%;
                 text-align: left;
@@ -357,19 +356,20 @@ def nav_button(label):
                 border: 1px solid #ddd;
                 background-color: #f5f5f5;
                 color: black;
+                font-weight: normal;
                 cursor: pointer;
             }}
 
-            /* Hover */
             div.stButton > button.{class_name}:hover {{
                 background-color: #e0e0e0;
             }}
 
-            /* Active (highlighted) */
+            /* ACTIVE BUTTON STYLE — GOLD + BLACK + BOLD */
             div.stButton > button.{class_name}.active {{
-                background-color: #4A90E2;
-                color: white;
-                border: 1px solid #4A90E2;
+                background-color: #FFD700;   /* gold */
+                color: black;
+                font-weight: bold;
+                border: 1px solid #DAA520;   /* darker gold border */
             }}
         </style>
     """, unsafe_allow_html=True)
