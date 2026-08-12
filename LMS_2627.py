@@ -504,7 +504,9 @@ if st.session_state.page == "Player Picks":
         st.markdown('<div class="mobile-table">', unsafe_allow_html=True)
         st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
+
+from collections import Counter
+
 elif st.session_state.page == "Leaderboard":
     st.header("Leaderboard")
     picks = load_picks_from_google()
@@ -539,7 +541,6 @@ elif st.session_state.page == "Leaderboard":
     st.markdown(leaderboard_df.to_html(index=False,escape=False), unsafe_allow_html=True)
 
 
-from collections import Counter
 
 def build_leaderboard1(picks_dict):
     rows = []
@@ -556,7 +557,6 @@ def build_leaderboard1(picks_dict):
         for gw_dict in picks_dict.values()
     ]
     freq = Counter(latest_picks)
-    
     for player, gw_dict in picks_dict.items():
         print(player, gw_dict.get(str(latest_gw)))
 
