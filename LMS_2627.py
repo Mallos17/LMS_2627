@@ -531,7 +531,7 @@ if st.session_state.page == "Player Picks":
     fixtures_processed = compute_results(fixtures)
 
     allowed = can_make_pick(player, current_gw, picks, fixtures_processed)
-    
+    st.text(f"{player}")
     if allowed:
         st.selectbox("Choose your team:", "Boo")
     else:
