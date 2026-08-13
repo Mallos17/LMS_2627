@@ -517,7 +517,7 @@ if st.session_state.page == "Player Picks":
     )
     
     st.text(f"{current_gw}")
-    if not can_make_pick(player, current_gw, picks, fixtures):
+    if not can_make_pick(player, current_gw, picks, gw_df_display):
         st.error("You picked incorrectly last week — you cannot make a pick this week.")
     else:
         st.selectbox("Choose your team:","boo")
