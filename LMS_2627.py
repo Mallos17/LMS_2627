@@ -319,19 +319,23 @@ def pick_correct(player, gw, picks_dict, fixtures_df):
     return pick == result
 
 def can_make_pick(player, next_gw, picks_dict, fixtures_df):
+    # GW1 → always allowed
+    if next_gw <= 1:
+        return True
+
     prev_gw = next_gw - 1
 
-    # If previous GW doesn't exist, allow picking
+    # If player didn't pick last GW → allow
     if prev_gw not in picks_dict.get(player, {}):
         return True
 
-    # If previous GW result isn't known yet, allow picking
-    if get_fixture_result(fixtures_df, prev_gw) is None:
+    # If previous GW result isn't known → allow
+    result = get_fixture_result(fixtures_df, prev_gw)
+    if result is None:
         return True
 
     # If previous pick was wrong → block
-    return pick_correct(player, prev_gw, picks_dict, fixtures_df)
-
+    return picks_dict[player][prev_gw] == result
 
 # Determine which GW the deadline should belong to
 if next_gw is not None:
@@ -517,6 +521,16 @@ if st.session_state.page == "Player Picks":
     )
     
     st.text(f"{current_gw}")
+    
+    fixtures_processed = prepare_results_table(fixtures)
+
+    allowed = can_make_pick(player, current_gw, picks, fixtures_processed)
+    
+    if allowed:
+        st.selectbox("Choose your team:", "Boo")
+    else:
+        st.error("You picked incorrectly last week — you cannot make a pick this week.")
+
     # Only enforce pick-blocking on the actual current GW
     #if st.session_state["selected_gw"] == current_gw:
     #    if current_gw > 1:
