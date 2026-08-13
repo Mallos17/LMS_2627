@@ -324,24 +324,27 @@ def pick_correct(player, gw, picks_dict, fixtures_df):
 
     return pick == result
 
-def can_make_pick(player, next_gw, picks_dict, fixtures_df):
+def can_make_pick(player, current_gw, picks_dict, fixtures_df):
     # GW1 → always allowed
-    if next_gw <= 1:
+    if current_gw <= 1:
         return True
 
-    prev_gw = next_gw - 1
+    prev_gw = current_gw - 1
 
     # If player didn't pick last GW → allow
     if prev_gw not in picks_dict.get(player, {}):
         return True
 
-    # If previous GW result isn't known → allow
-    result = get_fixture_result(fixtures_df, prev_gw)
-    if result is None:
+    prev_pick = picks_dict[player][prev_gw]
+    prev_result = get_fixture_result(fixtures_df, prev_gw)
+
+    # If no result yet → allow
+    if prev_result is None:
         return True
 
-    # If previous pick was wrong → block
-    return picks_dict[player][prev_gw] == result
+    # Block if wrong
+    return prev_pick == prev_result
+
 
 # Determine which GW the deadline should belong to
 if next_gw is not None:
