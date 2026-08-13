@@ -175,18 +175,17 @@ def prepare_results_table(df):
     else:
         df['HS'] = df['HS'].astype(int).astype(str)
         df["HS"] = df["HS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+        if df['HS'] > df['AS']:
+            df['result'] = df['Home']
+        elif df['HS'] < df['AS']:
+            df['result'] = df['Away']
+        else:
+            df['result'] = "Draw"
     if df['AS'].isna().any():
         df = df.drop(columns=['AS'])
     else:
         df['AS'] = df['AS'].astype(int).astype(str)
         df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
-    
-    if df['HS'] > df['AS']:
-        df['result'] = df['Home']
-    elif df['HS'] < df['AS']:
-        df['result'] = df['Away']
-    else:
-        df['result'] = "Draw"
     
     return df
 
