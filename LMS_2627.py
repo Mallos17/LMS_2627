@@ -178,12 +178,6 @@ def prepare_results_table(df):
         df["HS"] = df["HS"].astype(int)
         df["AS"] = df["AS"].astype(int)
 
-        # --- ⭐ Correct vectorised result calculation ---
-        df["result"] = None
-        df.loc[df["HS"] > df["AS"], "result"] = df["Home"]
-        df.loc[df["HS"] < df["AS"], "result"] = df["Away"]
-        df.loc[df["HS"] == df["AS"], "result"] = "Draw"
-
         # Convert scores back to strings + center align
         df["HS"] = df["HS"].astype(str).apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     
@@ -193,6 +187,18 @@ def prepare_results_table(df):
     else:
         df["AS"] = df["AS"].astype(str).apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     
+    return df
+
+def compute_results(fixtures_df):
+    df = fixtures_df.copy()
+
+    # Only compute results where scores exist
+    mask = df["HS"].notna() & df["AS"].notna()
+
+    df.loc[mask & (df["HS"] > df["AS"]), "result"] = df["Home"]
+    df.loc[mask & (df["HS"] < df["AS"]), "result"] = df["Away"]
+    df.loc[mask & (df["HS"] == df["AS"]), "result"] = "Draw"
+
     return df
 
 
@@ -522,7 +528,7 @@ if st.session_state.page == "Player Picks":
     
     st.text(f"{current_gw}")
     
-    fixtures_processed = prepare_results_table(fixtures)
+    fixtures_processed = compute_results(fixtures)
 
     allowed = can_make_pick(player, current_gw, picks, fixtures_processed)
     
