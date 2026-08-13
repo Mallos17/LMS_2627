@@ -173,9 +173,9 @@ def prepare_results_table(df):
     if df['HS'].isna().any():
         df = df.drop(columns=['HS'])
     else:
-        if df['HS'] > df['AS']:
+        if df['HS'].astype(int) > df['AS'].astype(int):
             df['result'] = df['Home']
-        elif df['HS'] < df['AS']:
+        elif df['HS'].astype(int) < df['AS'].astype(int):
             df['result'] = df['Away']
         else:
             df['result'] = "Draw"
