@@ -181,6 +181,13 @@ def prepare_results_table(df):
         df['AS'] = df['AS'].astype(int).astype(str)
         df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     
+    if df['HS'] > df['AS']:
+        df['result'] = df['Home']
+    elif df['HS'] < df['AS']:
+        df['result'] = df['Away']
+    else:
+        df['result'] = "Draw"
+    
     return df
 
 def gw_nav():
@@ -285,6 +292,40 @@ next_gw = gw_list[current_idx + 1] if current_idx + 1 < len(gw_list) else None
 # --- 3. Session state for selected GW ---
 if "selected_gw" not in st.session_state:
     st.session_state["selected_gw"] = current_gw
+    
+def get_fixture_result(fixtures_df, gw):
+    row = fixtures_df.loc[fixtures_df["gw"] == gw]
+
+    if row.empty:
+        return None
+
+    result = row["result"].iloc[0]
+
+    return result if pd.notna(result) else None
+
+def pick_correct(player, gw, picks_dict, fixtures_df):
+    pick = picks_dict.get(player, {}).get(gw)
+    result = get_fixture_result(fixtures_df, gw)
+
+    if result is None:
+        return None  # GW not completed yet
+
+    return pick == result
+
+def can_make_pick(player, next_gw, picks_dict, fixtures_df):
+    prev_gw = next_gw - 1
+
+    # If previous GW doesn't exist, allow picking
+    if prev_gw not in picks_dict.get(player, {}):
+        return True
+
+    # If previous GW result isn't known yet, allow picking
+    if get_fixture_result(fixtures_df, prev_gw) is None:
+        return True
+
+    # If previous pick was wrong → block
+    return pick_correct(player, prev_gw, picks_dict, fixtures_df)
+
 
 # Determine which GW the deadline should belong to
 if next_gw is not None:
@@ -409,7 +450,7 @@ if st.session_state.page == "Player Picks":
 
         new_name = st.text_input("Enter your full name")
         
-        st.caption("Please create a PIN to log in. Recommended PINs are birthdays, years etc - don't use your credit card PINs due to security risks")
+        st.caption("Please create a PIN to log in. Recommended PINs are birthdays, years, dates etc - don't use your credit card PINs due to security risks")
         new_pin = st.text_input("Choose a 4‑digit PIN", type="password")
 
         if st.button("Create"):
@@ -426,7 +467,7 @@ if st.session_state.page == "Player Picks":
 
     # --- LOAD EXISTING PLAYER ---
     if choice == "Load Player Page":
-        st.header("Load Player")
+        st.text("Load Player")
 
         players_dict = load_players_from_google()
         players = list(players_dict.keys())
@@ -469,6 +510,12 @@ if st.session_state.page == "Player Picks":
         unsafe_allow_html=True
     )
     
+    if not can_make_pick(player, current_gw, picks, fixtures):
+        st.error("You picked incorrectly last week — you cannot make a pick this week.")
+    else:
+        st.selectbox("Choose your team:","boo")
+
+
     # Display
     if st.session_state["current_player"] is not None:
         if in_play and existing_pick:
