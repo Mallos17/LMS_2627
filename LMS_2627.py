@@ -515,7 +515,7 @@ if st.session_state.page == "Player Picks":
         f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
         unsafe_allow_html=True
     )
-    
+    st.text(f"{current_gw}")
     if not can_make_pick(player, current_gw, picks, fixtures):
         st.error("You picked incorrectly last week — you cannot make a pick this week.")
     else:
