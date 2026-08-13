@@ -166,28 +166,35 @@ def prepare_results_table(df):
     
     df = df.reset_index(drop=True)
     
-    # Apply right alignment to Home column
+    # Apply alignment
     df["Home"] = df["Home"].apply(lambda x: f"<div style='text-align:left;'>{x}</div>")
     df["Away"] = df["Away"].apply(lambda x: f"<div style='text-align:right;'>{x}</div>")
     
-    if df['HS'].isna().any():
-        df = df.drop(columns=['HS'])
+    # --- 2. Handle HS (Home Score) ---
+    if df["HS"].isna().any():
+        df = df.drop(columns=["HS"])
     else:
-        if df['HS'].astype(int) > df['AS'].astype(int):
-            df['result'] = df['Home']
-        elif df['HS'].astype(int) < df['AS'].astype(int):
-            df['result'] = df['Away']
-        else:
-            df['result'] = "Draw"
-        df['HS'] = df['HS'].astype(int).astype(str)
-        df["HS"] = df["HS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
-    if df['AS'].isna().any():
-        df = df.drop(columns=['AS'])
+        # Convert to int safely
+        df["HS"] = df["HS"].astype(int)
+        df["AS"] = df["AS"].astype(int)
+
+        # --- ⭐ Correct vectorised result calculation ---
+        df["result"] = None
+        df.loc[df["HS"] > df["AS"], "result"] = df["Home"]
+        df.loc[df["HS"] < df["AS"], "result"] = df["Away"]
+        df.loc[df["HS"] == df["AS"], "result"] = "Draw"
+
+        # Convert scores back to strings + center align
+        df["HS"] = df["HS"].astype(str).apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+    
+    # --- 3. Handle AS (Away Score) ---
+    if df["AS"].isna().any():
+        df = df.drop(columns=["AS"])
     else:
-        df['AS'] = df['AS'].astype(int).astype(str)
-        df["AS"] = df["AS"].apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
+        df["AS"] = df["AS"].astype(str).apply(lambda x: f"<div style='text-align:center;'>{x}</div>")
     
     return df
+
 
 def gw_nav():
     # Always recalc index based on current selected GW
