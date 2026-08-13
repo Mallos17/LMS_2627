@@ -517,14 +517,18 @@ if st.session_state.page == "Player Picks":
     )
     
     st.text(f"{current_gw}")
-    if current_gw > 1:
-        if not can_make_pick(player, current_gw, picks, gw_df_display):
-            st.error("You picked incorrectly last week — you cannot make a pick this week.")
+    # Only enforce pick-blocking on the actual current GW
+    if st.session_state["selected_gw"] == current_gw:
+        if current_gw > 1:
+            if not can_make_pick(player, current_gw, picks, gw_df_display):
+                st.error("You picked incorrectly last week — you cannot make a pick this week.")
+            else:
+                st.selectbox("Choose your team:","boo")
         else:
-            st.selectbox("Choose your team:","boo")
+            ("Choose your team:","boo")
     else:
-        ("Choose your team:","boo")
-
+        # Browsing past or future GWs → never enforce blocking
+        st.info("Viewing past gameweek — picks are locked.")
 
     # Display
     if st.session_state["current_player"] is not None:
