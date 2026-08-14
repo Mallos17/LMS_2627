@@ -656,7 +656,7 @@ elif st.session_state.page == "Leaderboard":
 
         df = df[["Player Name"] + gw_cols_sorted]
         
-        df = df.fillna("OUT ❌")
+        df = df.fillna('<span style="color:red;font-weight:bold;">OUT ❌</span>')
     
         return df
 
