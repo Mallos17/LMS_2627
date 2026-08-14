@@ -629,6 +629,7 @@ elif st.session_state.page == "Leaderboard":
             raw_latest_pick = gw_dict.get(latest_gw, "") or ""
             row["_freq"] = freq[raw_latest_pick]
             row["_alpha"] = raw_latest_pick.lower()
+            row["_is_out"] = 1 if raw_latest_pick in ("", None, "OUT ❌") else 0
 
             rows.append(row)
 
@@ -636,20 +637,19 @@ elif st.session_state.page == "Leaderboard":
 
         # Sort by popularity desc, alphabetical asc
         df = df.sort_values(
-            ["_freq", "_alpha"],
-            ascending=[False, True],
+            ["_is_out", "_freq", "_alpha"],
+            ascending=[True, False, True],
             kind="mergesort"
             )
 
         # Drop helper columns
-        #df = df.drop(columns=["_freq", "_alpha"])
+        df = df.drop(columns=["_freq", "_alpha","_is_out"])
 
         # Sort GW columns numerically
         gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
-        
-        #df = df[["Player Name"] + gw_cols_sorted]
+        df = df[["Player Name"] + gw_cols_sorted]
         
         df = df.fillna("❌ OUT ❌")
         
