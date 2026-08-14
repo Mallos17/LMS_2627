@@ -640,6 +640,16 @@ elif st.session_state.page == "Leaderboard":
             ascending=[False, True],
             kind="mergesort"
             )
+
+        # Drop helper columns
+        #df = df.drop(columns=["_freq", "_alpha"])
+
+        # Sort GW columns numerically
+        gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
+        gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
+
+        
+        #df = df[["Player Name"] + gw_cols_sorted]
         
         df = df.fillna("❌ OUT ❌")
         
@@ -649,16 +659,7 @@ elif st.session_state.page == "Leaderboard":
                     lambda team: (
                         f"{badge_html_home(team)}"
                         ))
-
-        # Drop helper columns
-        #df = df.drop(columns=["_freq", "_alpha"])
-
-        # Sort GW columns numerically
-        gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
-        gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
-
-        df = df[["Player Name"] + gw_cols_sorted]
-    
+                
         return df
 
     leaderboard_df = build_leaderboard(picks)
