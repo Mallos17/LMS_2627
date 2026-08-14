@@ -549,7 +549,7 @@ if st.session_state.page == "Player Picks":
     
     out_week = list(picks[player].keys())[-1]
     used_teams = get_used_teams(player, picks)
-    available_teams = sorted(teams - set(used_teams))
+    available_teams = sorted(set(teams) - set(used_teams))
 
     if not allowed:
         st.error(f"You picked incorrectly in Gameweek {out_week} — you are OUT.")
