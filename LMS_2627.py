@@ -556,7 +556,10 @@ if st.session_state.page == "Player Picks":
     
     allowed = can_make_pick(player, current_gw, picks, gw_winners)
     
-    out_week = list(picks[player].keys())[-1]
+    if player is None:
+        pass
+    else:
+        out_week = list(picks[player].keys())[-1]
     used_teams = get_used_teams(player, picks)
     available_teams = sorted(set(teams) - set(used_teams))
 
