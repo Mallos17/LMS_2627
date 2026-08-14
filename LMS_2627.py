@@ -640,16 +640,15 @@ elif st.session_state.page == "Leaderboard":
             ascending=[False, True],
             kind="mergesort"
             )
-    
+        
+        df = df.fillna("OUT")
+        
         for col in df.columns:
             if col.startswith("Gameweek "):
                 df[col] = df[col].apply(
                     lambda team: (
                         f"{badge_html_home(team)}"
-                        if team not in (None, "", "nan", "NaN")
-                        else '<span style="color:red;font-weight:bold;">OUT ❌</span>'
-                    )
-                )
+                        ))
 
         # Drop helper columns
         df = df.drop(columns=["_freq", "_alpha"])
