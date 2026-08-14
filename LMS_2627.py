@@ -559,7 +559,8 @@ if st.session_state.page == "Player Picks":
     if player is None:
         pass
     elif picks.get(player,{}).get(1) is None:
-        pass
+        st.error("Round in play, please wait for the next round")
+        st.stop()
     else:
         out_week = list(picks[player].keys())[-1]
     used_teams = get_used_teams(player, picks)
