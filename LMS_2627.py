@@ -192,7 +192,6 @@ def prepare_results_table(df):
 def compute_results(fixtures_df):
     df = fixtures_df.copy()
 
-    # Only compute results where scores exist
     mask = df["HS"].notna() & df["AS"].notna()
 
     df.loc[mask & (df["HS"] > df["AS"]), "result"] = df["Home"]
@@ -200,6 +199,19 @@ def compute_results(fixtures_df):
     df.loc[mask & (df["HS"] == df["AS"]), "result"] = "Draw"
 
     return df
+
+def get_gw_winners(fixtures_df):
+    winners = {}
+
+    for gw in fixtures_df["GW"].unique():
+        gw_df = fixtures_df[fixtures_df["GW"] == gw]
+
+        # Only matches with results
+        gw_df = gw_df[gw_df["result"].notna()]
+
+        winners[gw] = gw_df["result"].tolist()
+
+    return winners
 
 
 def gw_nav():
@@ -324,7 +336,7 @@ def pick_correct(player, gw, picks_dict, fixtures_df):
 
     return pick == result
 
-def can_make_pick(player, current_gw, picks_dict, fixtures_df):
+def can_make_pick(player, current_gw, picks_dict, gw_winners):
     # GW1 → always allowed
     if current_gw <= 1:
         return True
@@ -332,18 +344,17 @@ def can_make_pick(player, current_gw, picks_dict, fixtures_df):
     prev_gw = current_gw - 1
 
     # If player didn't pick last GW → allow
-    if prev_gw not in picks_dict.get(player, {}):
+    prev_pick = picks_dict.get(player, {}).get(prev_gw)
+    if prev_pick is None:
         return True
 
-    prev_pick = picks_dict[player][prev_gw]
-    prev_result = get_fixture_result(fixtures_df, prev_gw)
-
-    # If no result yet → allow
-    if prev_result is None:
+    # If previous GW has no winners yet → allow
+    if prev_gw not in gw_winners:
         return True
 
-    # Block if wrong
-    return prev_pick == prev_result
+    # Block if the pick is NOT in the winners list
+    return prev_pick in gw_winners[prev_gw]
+
 
 
 # Determine which GW the deadline should belong to
@@ -532,15 +543,15 @@ if st.session_state.page == "Player Picks":
     st.text(f"{current_gw}")
     
     fixtures_processed = compute_results(fixtures)
+    gw_winners = get_gw_winners(fixtures_processed)
 
-    allowed = can_make_pick(player, current_gw, picks, fixtures_processed)
-    st.text(f"{player}, {picks}")
-    st.text(f"{picks[player][current_gw-1]}")
-    
+    allowed = can_make_pick(player, current_gw, gw_winners)
+
     if allowed:
         st.selectbox("Choose your team:", "Boo")
     else:
         st.error("You picked incorrectly last week — you cannot make a pick this week.")
+
 
     # Only enforce pick-blocking on the actual current GW
     #if st.session_state["selected_gw"] == current_gw:
