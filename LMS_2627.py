@@ -355,7 +355,8 @@ def can_make_pick(player, current_gw, picks_dict, gw_winners):
     # Block if the pick is NOT in the winners list
     return prev_pick in gw_winners[prev_gw]
 
-
+def get_used_teams(player, picks_dict):
+    return list(picks_dict.get(player, {}).values())
 
 # Determine which GW the deadline should belong to
 if next_gw is not None:
@@ -541,11 +542,14 @@ if st.session_state.page == "Player Picks":
     )
     
     fixtures_processed = compute_results(fixtures)
+    teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
     gw_winners = get_gw_winners(fixtures_processed)
-
+    
     allowed = can_make_pick(player, current_gw, picks, gw_winners)
     
     out_week = list(picks[player].keys())[-1]
+    used_teams = get_used_teams(player, picks)
+    available_teams = sorted(teams - set(used_teams))
 
     if not allowed:
         st.error(f"You picked incorrectly in Gameweek {out_week} — you are OUT.")
@@ -567,8 +571,7 @@ if st.session_state.page == "Player Picks":
                 st.markdown(f"**{countdown_text}**")
     
                 # --- 6. Pick a team ---
-                teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
-                pick = st.selectbox(f"Pick your team for GW{current_gw}:", teams)
+                pick = st.selectbox(f"Pick your team for GW{current_gw}:", available_teams)
 
                 # --- 8. Confirm pick ---
                 if st.button("Confirm Pick"):
@@ -577,8 +580,8 @@ if st.session_state.page == "Player Picks":
                     st.cache_data.clear()
         
                 # --- 7. Used teams (example) ---
-                used_teams = ["Arsenal", "Chelsea"]
-                st.markdown("### Teams not available to you:")
+                
+                st.warning("### Teams not available to you:")
                 st.write(", ".join(used_teams))
 
     gw_nav()
