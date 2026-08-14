@@ -641,7 +641,7 @@ elif st.session_state.page == "Leaderboard":
             kind="mergesort"
             )
         
-        df = df.fillna("OUT")
+        df = df.fillna("❌ OUT ❌")
         
         for col in df.columns:
             if col.startswith("Gameweek "):
