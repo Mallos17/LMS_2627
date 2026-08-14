@@ -644,9 +644,13 @@ elif st.session_state.page == "Leaderboard":
         for col in df.columns:
             if col.startswith("Gameweek "):
                 df[col] = df[col].apply(
-                    lambda team: f"{badge_html_home(team)}" if team else ""
+                    lambda team: (
+                        f"{badge_html_home(team)}"
+                        if team not in (None, "", "nan", "NaN")
+                        else '<span style="color:red;font-weight:bold;">OUT ❌</span>'
                     )
-            
+                )
+
         # Drop helper columns
         df = df.drop(columns=["_freq", "_alpha"])
 
@@ -655,8 +659,6 @@ elif st.session_state.page == "Leaderboard":
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
         df = df[["Player Name"] + gw_cols_sorted]
-        
-        df = df.fillna('<span style="color:red;font-weight:bold;">OUT ❌</span>')
     
         return df
 
