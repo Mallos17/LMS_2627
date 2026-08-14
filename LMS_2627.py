@@ -558,7 +558,7 @@ if st.session_state.page == "Player Picks":
     
     if player is None:
         pass
-    elif picks.get(player,{}).get(1) is not None:
+    elif picks.get(player,{}).get(1) is None:
         pass
     else:
         out_week = list(picks[player].keys())[-1]
