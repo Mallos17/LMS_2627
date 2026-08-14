@@ -464,7 +464,9 @@ div[role="radiogroup"] > label[data-selected="true"] {
 #nav_button("Player Picks")
 #nav_button("Leaderboard")
 
-#st.write(f"Current page: {st.session_state.page}")
+
+
+round_in_play = (current_gw > 1) or (current_gw == 1 and in_play)
 
 from collections import Counter
 
@@ -527,6 +529,10 @@ if st.session_state.page == "Player Picks":
         st.markdown("Not logged in")
     else:
         st.markdown(f"Logged in as: **{player}**")
+    
+    if round_in_play:
+        st.error("Round in play, please wait for the next round")
+        st.stop()
     
     picks = load_picks_from_google()
     player_picks = picks.get(player, {})
