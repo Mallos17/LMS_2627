@@ -470,6 +470,8 @@ round_in_play = (current_gw > 1) or (current_gw == 1 and in_play)
 
 from collections import Counter
 
+new_player = False
+
 if st.session_state.page == "Player Picks":
 
     choice = st.radio(
@@ -496,6 +498,7 @@ if st.session_state.page == "Player Picks":
                 st.success(f"Player {new_name} created")
 
                 st.session_state["current_player"] = new_name
+                new_player = True
                 st.rerun()
 
     # --- LOAD EXISTING PLAYER ---
@@ -530,14 +533,6 @@ if st.session_state.page == "Player Picks":
     else:
         st.markdown(f"Logged in as: **{player}**")
     
-    if round_in_play:
-        st.error("Round in play, please wait for the next round")
-        st.stop()
-    
-    picks = load_picks_from_google()
-    player_picks = picks.get(player, {})
-    existing_pick = player_picks.get(current_gw)
-    
     # --- 5. Fixtures for selected GW ---
     gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
     gw_df_display = prepare_results_table(gw_df)
@@ -546,6 +541,14 @@ if st.session_state.page == "Player Picks":
         f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
         unsafe_allow_html=True
     )
+    
+    if round_in_play and new_player:
+        st.error("Round in play, please wait for the next round")
+        st.stop()
+    
+    picks = load_picks_from_google()
+    player_picks = picks.get(player, {})
+    existing_pick = player_picks.get(current_gw)
     
     fixtures_processed = compute_results(fixtures)
     teams = sorted(set(gw_df["Home"]).union(set(gw_df["Away"])))
