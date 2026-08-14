@@ -545,7 +545,7 @@ if st.session_state.page == "Player Picks":
     fixtures_processed = compute_results(fixtures)
     gw_winners = get_gw_winners(fixtures_processed)
 
-    allowed = can_make_pick(player, current_gw, gw_winners)
+    allowed = can_make_pick(player, current_gw, picks, gw_winners)
 
     if allowed:
         st.selectbox("Choose your team:", "Boo")
