@@ -651,7 +651,7 @@ elif st.session_state.page == "Leaderboard":
                         ))
 
         # Drop helper columns
-        df = df.drop(columns=["_freq", "_alpha"])
+        #df = df.drop(columns=["_freq", "_alpha"])
 
         # Sort GW columns numerically
         gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
