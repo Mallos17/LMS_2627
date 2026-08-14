@@ -581,7 +581,7 @@ if st.session_state.page == "Player Picks":
         
                 # --- 7. Used teams (example) ---
                 
-                st.warning("### Teams not available to you:")
+                st.warning("Teams not available to you:")
                 st.write(", ".join(used_teams))
 
     gw_nav()
