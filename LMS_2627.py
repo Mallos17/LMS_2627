@@ -655,6 +655,8 @@ elif st.session_state.page == "Leaderboard":
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
         df = df[["Player Name"] + gw_cols_sorted]
+        
+        df = df.fillna("OUT ❌")
     
         return df
 
