@@ -546,11 +546,13 @@ if st.session_state.page == "Player Picks":
     gw_winners = get_gw_winners(fixtures_processed)
 
     allowed = can_make_pick(player, current_gw, picks, gw_winners)
+    
+    out_week = list(picks[player].keys())[-1]
 
     if allowed:
         st.selectbox("Choose your team:", "Boo")
     else:
-        st.error("You picked incorrectly last week — you cannot make a pick this week.")
+        st.error(f"You picked incorrectly in Gameweek {out_week} — you cannot make a pick this week.")
 
 
     # Only enforce pick-blocking on the actual current GW
