@@ -767,21 +767,23 @@ elif st.session_state.page == "Leaderboard":
         for col in df.columns:
             if col.startswith("Gameweek "):
                 gw_num = int(col.split()[1])
+
                 df[col] = df[col].apply(
                     lambda pick: (
-                        # OUT only if deadline passed AND no pick
+                        # 1. Player is OUT (eliminated)
                         "❌ OUT ❌"
-                        if (gw_num == current_gw and time_left.total_seconds() > 0 and not allowed)
+                        if (gw_num == current_gw and not allowed)
 
-                        # PICK TBC if GW is in play OR player is still alive but hasn't picked yet
+                        # 2. Player is still alive but hasn't picked yet
                         else "PICK TBC"
-                        if (gw_num == current_gw and pick in ("", None))
+                        if (gw_num == current_gw and allowed and pick in ("", None))
 
-                        # Otherwise show the actual pick
+                        # 3. Otherwise show the actual pick
                         else pick
                         )
                     )
 
+                
         # Apply badge HTML only to visible picks
         for col in df.columns:
             if col.startswith("Gameweek "):
