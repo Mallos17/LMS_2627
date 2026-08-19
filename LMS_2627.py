@@ -421,8 +421,9 @@ if "page" not in st.session_state:
 
 # Sidebar navigation
 pages = {
-    "Player Picks": "⭐",
-    "Leaderboard": "🏆"
+    "Player Pick": "🔮",
+    "Leaderboard": "🏆",
+    "Results": "📊"
 }
 
 choice = st.sidebar.radio(
@@ -472,7 +473,7 @@ from collections import Counter
 
 new_player = False
 
-if st.session_state.page == "Player Picks":
+if st.session_state.page == "Player Pick":
 
     choice = st.radio(
         "Please load your user page or create a new log in",
@@ -598,14 +599,15 @@ if st.session_state.page == "Player Picks":
                 
                 st.warning("Teams not available to you: " + ", ".join(used_teams))
 
+
+
+elif st.session_state.page == "Results":
     gw_nav()
     
     with st.container():
         st.markdown('<div class="mobile-table">', unsafe_allow_html=True)
         st.markdown(gw_df_display.to_html(index=False, escape=False), unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
-
-
 
 elif st.session_state.page == "Leaderboard":
 
