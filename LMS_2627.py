@@ -768,7 +768,7 @@ elif st.session_state.page == "Leaderboard":
                     lambda pick: (
                         # OUT only if deadline passed AND no pick
                         "❌ OUT ❌"
-                        if (gw_num == current_gw and not in_play and pick in ("", None))
+                        if (gw_num == current_gw and time_left.total_seconds() > 0 and pick in ("", None))
 
                         # PICK TBC if GW is in play OR player is still alive but hasn't picked yet
                         else "PICK TBC"
