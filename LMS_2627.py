@@ -597,6 +597,11 @@ if st.session_state.page == "Player Pick":
 
 
 elif st.session_state.page == "Results":
+    
+    # --- 5. Fixtures for selected GW ---
+    gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
+    gw_df_display = prepare_results_table(gw_df)
+    
     st.markdown(
         f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
         unsafe_allow_html=True
