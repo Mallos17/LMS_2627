@@ -686,7 +686,7 @@ elif st.session_state.page == "Leaderboard":
                 
         return df
     
-    def build_leaderboard2(picks_dict, current_gw, in_play):
+    def build_leaderboard2(picks_dict, current_gw, time_left):
         rows = []
 
         # Determine latest GW that actually has picks
@@ -719,7 +719,7 @@ elif st.session_state.page == "Leaderboard":
 
                 # 2. Current GW → hide picks if GW is still in play
                 elif gw == current_gw:
-                    if in_play:
+                    if time_left.total_seconds() <= 0:
                         row[f"Gameweek {gw}"] = ""   # hide picks until deadline passes
                     else:
                         row[f"Gameweek {gw}"] = pick or ""
@@ -730,7 +730,7 @@ elif st.session_state.page == "Leaderboard":
 
             # OUT logic: only OUT if deadline passed AND no pick
             raw_current_pick = gw_dict.get(current_gw, "")
-            is_out = (not in_play) and (raw_current_pick in ("", None))
+            is_out = (time_left.total_seconds() > 0) and (raw_current_pick in ("", None))
             row["_is_out"] = 1 if is_out else 0
 
             # Sorting helpers
@@ -765,7 +765,7 @@ elif st.session_state.page == "Leaderboard":
                 df[col] = df[col].apply(
                     lambda pick: (
                         "❌ OUT ❌"
-                        if (gw_num == current_gw and not in_play and pick in ("", None))
+                        if (gw_num == current_gw and time_left.total_seconds() > 0 and pick in ("", None))
                         else pick
                         )
                     )
@@ -779,7 +779,7 @@ elif st.session_state.page == "Leaderboard":
 
 
     #leaderboard_df = build_leaderboard(picks)
-    leaderboard_df = build_leaderboard2(picks,current_gw,in_play)
+    leaderboard_df = build_leaderboard2(picks,current_gw,time_left)
     st.markdown(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     
