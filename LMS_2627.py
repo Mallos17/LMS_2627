@@ -582,7 +582,10 @@ if st.session_state.page == "Player Pick":
                 st.markdown(f"**{countdown_text}**")
     
                 # --- 6. Pick a team ---
-                pick = st.selectbox(f"Pick your team for GW{current_gw}:", available_teams)
+                pick = st.selectbox(f"Pick your team for GW{current_gw}:",available_teams,
+                                    index=None,
+                                    placeholder="Pick team"
+                                    )
 
                 # --- 8. Confirm pick ---
                 if st.button("Confirm Pick"):
