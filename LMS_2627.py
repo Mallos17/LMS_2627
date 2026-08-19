@@ -705,10 +705,13 @@ elif st.session_state.page == "Leaderboard":
             latest_raw_picks.append(pick if pick else "")
 
         freq = Counter(latest_raw_picks)
+        fixtures_processed = compute_results(fixtures)
+        gw_winners = get_gw_winners(fixtures_processed)
 
         # Build rows
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
+            allowed = can_make_pick(player, current_gw, picks_dict, gw_winners)
 
             # Build GW columns with your new rules
             for gw in range(1, latest_gw + 1):
@@ -759,7 +762,7 @@ elif st.session_state.page == "Leaderboard":
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
         df = df[["Player Name"] + gw_cols_sorted]
-
+        
         # Apply OUT only to current GW after deadline
         for col in df.columns:
             if col.startswith("Gameweek "):
@@ -768,7 +771,7 @@ elif st.session_state.page == "Leaderboard":
                     lambda pick: (
                         # OUT only if deadline passed AND no pick
                         "❌ OUT ❌"
-                        if (gw_num == current_gw and time_left.total_seconds() > 0 and pick in ("", None))
+                        if (gw_num == current_gw and time_left.total_seconds() > 0 and not allowed)
 
                         # PICK TBC if GW is in play OR player is still alive but hasn't picked yet
                         else "PICK TBC"
