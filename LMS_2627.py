@@ -685,8 +685,101 @@ elif st.session_state.page == "Leaderboard":
                         ))
                 
         return df
+    
+    def build_leaderboard2(picks_dict, current_gw, in_play):
+        rows = []
 
-    leaderboard_df = build_leaderboard(picks)
+        # Determine latest GW that actually has picks
+        all_real_gws = set()
+        for gw_dict in picks_dict.values():
+            for gw, pick in gw_dict.items():
+                if pick not in (None, "", " "):
+                    all_real_gws.add(gw)
+
+        latest_gw = max(all_real_gws)
+
+        # Count frequency using RAW team names
+        latest_raw_picks = []
+        for gw_dict in picks_dict.values():
+            pick = gw_dict.get(latest_gw, "")
+            latest_raw_picks.append(pick if pick else "")
+
+        freq = Counter(latest_raw_picks)
+
+        # Build rows
+        for player, gw_dict in picks_dict.items():
+            row = {"Player Name": player}
+
+            # Build GW columns with your new rules
+            for gw, pick in gw_dict.items():
+
+                # 1. Past GWs → always show picks
+                if gw < current_gw:
+                    row[f"Gameweek {gw}"] = pick or ""
+
+                # 2. Current GW → hide picks if GW is still in play
+                elif gw == current_gw:
+                    if in_play:
+                        row[f"Gameweek {gw}"] = ""   # hide picks until deadline passes
+                    else:
+                        row[f"Gameweek {gw}"] = pick or ""
+
+                # 3. Future GWs → always blank
+                else:
+                    row[f"Gameweek {gw}"] = ""
+
+            # OUT logic: only OUT if deadline passed AND no pick
+            raw_current_pick = gw_dict.get(current_gw, "")
+            is_out = (not in_play) and (raw_current_pick in ("", None))
+            row["_is_out"] = 1 if is_out else 0
+
+            # Sorting helpers
+            raw_latest_pick = gw_dict.get(latest_gw, "") or ""
+            row["_freq"] = freq[raw_latest_pick]
+            row["_alpha"] = raw_latest_pick.lower()
+
+            rows.append(row)
+
+        df = pd.DataFrame(rows)
+
+        # Sort by OUT first, then popularity, then alphabetical
+        df = df.sort_values(
+            ["_is_out", "_freq", "_alpha"],
+            ascending=[True, False, True],
+            kind="mergesort"
+            )
+
+        # Drop helper columns
+        df = df.drop(columns=["_freq", "_alpha", "_is_out"])
+
+        # Sort GW columns numerically
+        gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
+        gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
+
+        df = df[["Player Name"] + gw_cols_sorted]
+
+        # Apply OUT only to current GW after deadline
+        for col in df.columns:
+            if col.startswith("Gameweek "):
+                gw_num = int(col.split()[1])
+                df[col] = df[col].apply(
+                    lambda pick: (
+                        "❌ OUT ❌"
+                        if (gw_num == current_gw and not in_play and pick in ("", None))
+                        else pick
+                        )
+                    )
+
+        # Apply badge HTML only to visible picks
+        for col in df.columns:
+            if col.startswith("Gameweek "):
+                df[col] = df[col].apply(lambda team: badge_html_home(team))
+
+        return df
+
+
+    #leaderboard_df = build_leaderboard(picks)
+    leaderboard_df = build_leaderboard2(picks,current_gw,in_play)
     st.markdown(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     
