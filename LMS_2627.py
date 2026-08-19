@@ -711,8 +711,10 @@ elif st.session_state.page == "Leaderboard":
             row = {"Player Name": player}
 
             # Build GW columns with your new rules
-            for gw, pick in gw_dict.items():
-
+            for gw in range(1, latest_gw + 1):
+                
+                pick = gw_dict.get(gw, "")
+                
                 # 1. Past GWs → always show picks
                 if gw < current_gw:
                     row[f"Gameweek {gw}"] = pick or ""
@@ -730,7 +732,7 @@ elif st.session_state.page == "Leaderboard":
 
             # OUT logic: only OUT if deadline passed AND no pick
             raw_current_pick = gw_dict.get(current_gw, "")
-            is_out = (time_left.total_seconds() > 0) and (raw_current_pick in ("", None))
+            is_out = (time_left.total_seconds() > 0) and (raw_current_pick in ("", None,""))
             row["_is_out"] = 1 if is_out else 0
 
             # Sorting helpers
@@ -779,6 +781,8 @@ elif st.session_state.page == "Leaderboard":
 
 
     #leaderboard_df = build_leaderboard(picks)
+    st.text(f"{time_left}")
+    st.text(f"{current_gw}")
     leaderboard_df = build_leaderboard2(picks,current_gw,time_left)
     st.markdown(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
