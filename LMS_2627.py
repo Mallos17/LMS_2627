@@ -686,8 +686,11 @@ elif st.session_state.page == "Leaderboard":
                 
         return df
     
-    def build_leaderboard2(picks_dict, current_gw, time_left):
+    def build_leaderboard2(picks_dict, current_gw, time_left, fixtures):
         rows = []
+
+        fixtures_processed = compute_results(fixtures)
+        gw_winners = get_gw_winners(fixtures_processed)
 
         # Determine latest GW that actually has picks
         all_real_gws = set()
@@ -705,43 +708,46 @@ elif st.session_state.page == "Leaderboard":
             latest_raw_picks.append(pick if pick else "")
 
         freq = Counter(latest_raw_picks)
-        fixtures_processed = compute_results(fixtures)
-        gw_winners = get_gw_winners(fixtures_processed)
 
         # Build rows
         for player, gw_dict in picks_dict.items():
             row = {"Player Name": player}
             allowed = can_make_pick(player, current_gw, picks_dict, gw_winners)
 
-            # Build GW columns with your new rules
             for gw in range(1, latest_gw + 1):
-                
                 pick = gw_dict.get(gw, "")
-                
-                # 1. Past GWs → always show picks
+
+                # Past GWs → always show picks
                 if gw < current_gw:
                     row[f"Gameweek {gw}"] = pick or ""
 
-                # 2. Current GW → hide picks if GW is still in play
+                # Current GW → use allowed + time_left + pick
                 elif gw == current_gw:
-                    if time_left.total_seconds() <= 0:
-                        row[f"Gameweek {gw}"] = ""   # hide picks until deadline passes
+                    if not allowed:
+                        # Player is OUT
+                        row[f"Gameweek {gw}"] = "❌ OUT ❌"
                     else:
-                        row[f"Gameweek {gw}"] = pick or ""
+                        # Player is still alive
+                        if pick in ("", None, ""):
+                            # Alive but no pick yet
+                            if time_left.total_seconds() > 0:
+                                row[f"Gameweek {gw}"] = "PICK TBC"
+                            else:
+                                # Deadline passed, still no pick → OUT
+                                row[f"Gameweek {gw}"] = "❌ OUT ❌"
+                        else:
+                            # Alive and has picked
+                            row[f"Gameweek {gw}"] = pick
 
-                # 3. Future GWs → always blank
+                # Future GWs → always blank
                 else:
                     row[f"Gameweek {gw}"] = ""
-
-            # OUT logic: only OUT if deadline passed AND no pick
-            raw_current_pick = gw_dict.get(current_gw, "")
-            is_out = (time_left.total_seconds() > 0) and (raw_current_pick in ("", None,""))
-            row["_is_out"] = 1 if is_out else 0
 
             # Sorting helpers
             raw_latest_pick = gw_dict.get(latest_gw, "") or ""
             row["_freq"] = freq[raw_latest_pick]
             row["_alpha"] = raw_latest_pick.lower()
+            row["_is_out"] = 0 if allowed else 1
 
             rows.append(row)
 
@@ -762,45 +768,24 @@ elif st.session_state.page == "Leaderboard":
         gw_cols_sorted = sorted(gw_cols, key=lambda x: int(x.split()[1]))
 
         df = df[["Player Name"] + gw_cols_sorted]
-        
-        # Apply OUT only to current GW after deadline
+
+        # Apply badge HTML only to real team picks
         for col in df.columns:
             if col.startswith("Gameweek "):
-                gw_num = int(col.split()[1])
-
-                def status(pick):
-                    # CURRENT GAMEWEEK ONLY
-                    if gw_num == current_gw:
-
-                        # 1. Player is OUT (eliminated)
-                        if not allowed:
-                            return "❌ OUT ❌"
-
-                        # 2. Player is alive but hasn't picked yet
-                        if pick in ("", None):
-                            return "PICK TBC"
-
-                        # 3. Player is alive and HAS picked
-                        return pick
-
-                    # OTHER GAMEWEEKS → just return pick
-                    return pick
-
-                df[col] = df[col].apply(status)
-
-                
-        # Apply badge HTML only to visible picks
-        for col in df.columns:
-            if col.startswith("Gameweek "):
-                df[col] = df[col].apply(lambda team: badge_html_home(team))
+                df[col] = df[col].apply(
+                    lambda team: badge_html_home(team)
+                    if team not in ("", None, "❌ OUT ❌", "PICK TBC")
+                    else team
+                    )
 
         return df
+
 
 
     #leaderboard_df = build_leaderboard(picks)
     st.text(f"{time_left}")
     st.text(f"{current_gw}")
-    leaderboard_df = build_leaderboard2(picks,current_gw,time_left)
+    leaderboard_df = build_leaderboard2(picks,current_gw,time_left,fixtures)
     st.markdown(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
 
     
