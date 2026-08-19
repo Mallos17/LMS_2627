@@ -768,20 +768,25 @@ elif st.session_state.page == "Leaderboard":
             if col.startswith("Gameweek "):
                 gw_num = int(col.split()[1])
 
-                df[col] = df[col].apply(
-                    lambda pick: (
+                def status(pick):
+                    # CURRENT GAMEWEEK ONLY
+                    if gw_num == current_gw:
+
                         # 1. Player is OUT (eliminated)
-                        "❌ OUT ❌"
-                        if (gw_num == current_gw and not allowed)
+                        if not allowed:
+                            return "❌ OUT ❌"
 
-                        # 2. Player is still alive but hasn't picked yet
-                        else "PICK TBC"
-                        if (gw_num == current_gw and allowed and pick in ("", None))
+                        # 2. Player is alive but hasn't picked yet
+                        if pick in ("", None):
+                            return "PICK TBC"
 
-                        # 3. Otherwise show the actual pick
-                        else pick
-                        )
-                    )
+                        # 3. Player is alive and HAS picked
+                        return pick
+
+                    # OTHER GAMEWEEKS → just return pick
+                    return pick
+
+                df[col] = df[col].apply(status)
 
                 
         # Apply badge HTML only to visible picks
