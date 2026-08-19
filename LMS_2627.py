@@ -742,7 +742,17 @@ elif st.session_state.page == "Leaderboard":
                 # Future GWs → always blank
                 else:
                     row[f"Gameweek {gw}"] = ""
+            
+            # Sorting rank
+            if not allowed:
+                state_rank = 2
+            elif pick in ("", None):
+                state_rank = 1
+            else:
+                state_rank = 0
 
+            row["_state_rank"] = state_rank
+            
             # Sorting helpers
             raw_latest_pick = gw_dict.get(latest_gw, "") or ""
             row["_freq"] = freq[raw_latest_pick]
@@ -755,13 +765,13 @@ elif st.session_state.page == "Leaderboard":
 
         # Sort by OUT first, then popularity, then alphabetical
         df = df.sort_values(
-            ["_is_out", "_freq", "_alpha"],
+            ["_state_rank", "_freq", "_alpha"],
             ascending=[True, False, True],
             kind="mergesort"
             )
 
         # Drop helper columns
-        df = df.drop(columns=["_freq", "_alpha", "_is_out"])
+        df = df.drop(columns=["_state_rank", "_freq", "_alpha"])
 
         # Sort GW columns numerically
         gw_cols = [col for col in df.columns if col.startswith("Gameweek ")]
