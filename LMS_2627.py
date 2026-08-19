@@ -538,11 +538,6 @@ if st.session_state.page == "Player Pick":
     gw_df = fixtures[fixtures["GW"] == st.session_state["selected_gw"]]
     gw_df_display = prepare_results_table(gw_df)
     
-    st.markdown(
-        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
-        unsafe_allow_html=True
-    )
-    
     if round_in_play and new_player:
         st.error("Round in play, please wait for the next round")
         st.stop()
@@ -579,11 +574,11 @@ if st.session_state.page == "Player Pick":
                 st.markdown("<h4 style='color: red;'>Deadline passed - Gameweek in play</h4>",unsafe_allow_html=True)
                 st.warning(f"No pick selected for for GW{current_gw}")
             elif not in_play and existing_pick:
-                st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+                st.markdown(f"### Deadline for current Gameweek: {deadline.strftime('%a %d %b, %H:%M')}")
                 st.markdown(f"**{countdown_text}**")
                 st.success(f"You have picked **{existing_pick.upper()}** for GW{current_gw}.")
             elif not in_play and not existing_pick:
-                st.markdown(f"### Deadline for GW{current_gw}: {deadline.strftime('%a %d %b, %H:%M')}")
+                st.markdown(f"### Deadline for current Gameweek: {deadline.strftime('%a %d %b, %H:%M')}")
                 st.markdown(f"**{countdown_text}**")
     
                 # --- 6. Pick a team ---
@@ -602,6 +597,10 @@ if st.session_state.page == "Player Pick":
 
 
 elif st.session_state.page == "Results":
+    st.markdown(
+        f"<h4 style='text-align:center; color:green;'>Current Gameweek: GW{current_gw}</h4>",
+        unsafe_allow_html=True
+    )
     gw_nav()
     
     with st.container():
